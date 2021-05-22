@@ -12,11 +12,20 @@ client.on('ready', () => {
     console.log("Bot successfully logged in: " + client.user.tag);
 });
 
+eugena = false;
 //when a message is sent
 client.on('message', (message) =>{
     if(message.author.discriminator === '8517'){
-        message.channel.send(message.content);
-        message.delete();
+
+        if(message.content === "swap"){
+            eugena = !eugena;
+            message.delete();
+        }
+        else if(eugena){
+            message.channel.send(message.content);
+            message.delete();
+        }
+       
     }
 });
 
