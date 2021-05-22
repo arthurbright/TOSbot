@@ -18,8 +18,6 @@ client.on('message', (message) =>{
         message.channel.send(message.content);
         message.delete();
     }
-
-    console.log(message.channel.name);
 });
 
 
