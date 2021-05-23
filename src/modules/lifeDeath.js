@@ -1,16 +1,29 @@
 const { Client } = require('discord.js');
 
+//function to get the alive role
+function getAliveRole(message){
+    var roleAlive = message.guild.roles.cache.find((role) =>{
+        return role.name === "alive";
+    });
+    return roleAlive;
+}
+
+//function to get the dead role
+function getDeadRole(message){
+    var roleDead = message.guild.roles.cache.find((role) =>{
+        return role.name === "dead";
+    });
+    return roleDead;
+}
+
+
+//kill a person
 function kill(client, message){
     target = message.mentions.users.first();
     member = message.guild.members.cache.get(target.id);
 
-    var roleDead = message.guild.roles.cache.find((role) =>{
-        return role.name === "dead";
-    });
-
-    var roleAlive = message.guild.roles.cache.find((role) =>{
-        return role.name === "alive";
-    });
+    roleAlive = getAliveRole(message);
+    roleDead = getDeadRole(message);
         
     member.roles.remove(roleAlive);
     member.roles.add(roleDead);
@@ -19,31 +32,23 @@ function kill(client, message){
     message.delete();
 }
 
+//revive a person
 function revive(client, message){
     target = message.mentions.users.first();
     member = message.guild.members.cache.get(target.id);
 
-    var roleDead = message.guild.roles.cache.find((role) =>{
-        return role.name === "dead";
-    });
-
-    var roleAlive = message.guild.roles.cache.find((role) =>{
-        return role.name === "alive";
-    });
+    roleAlive = getAliveRole(message);
+    roleDead = getDeadRole(message);
         
     member.roles.add(roleAlive);
     member.roles.remove(roleDead);
     message.delete();
 }
 
+//revive everyone
 function reviveAll(client, message){
-    var roleDead = message.guild.roles.cache.find((role) =>{
-        return role.name === "dead";
-    });
-
-    var roleAlive = message.guild.roles.cache.find((role) =>{
-        return role.name === "alive";
-    }); 
+    roleAlive = getAliveRole(message);
+    roleDead = getDeadRole(message);
 
     for(member of message.guild.members.cache.values()){
         member.roles.add(roleAlive);
@@ -55,7 +60,7 @@ function reviveAll(client, message){
 
 
 
-
+//exports
 module.exports.kill = kill;
 module.exports.revive = revive;
 module.exports.reviveAll = reviveAll;
