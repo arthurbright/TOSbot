@@ -1,11 +1,16 @@
 const { Client } = require('discord.js');
 
+//id to username
+function getUsername(client, id){
+    return client.users.cache.get(id).username;
+}
 
+//main function: provide list of id's to player in dms, return their choice of id
 function askMove(client, targetId, numChoices, players, callback){
        //create message
     str = "Select your target(s) for tonight by responding with their number:";
     for(i = 1; i <= players.length; i ++){
-        str += "\n" + i + ". " + players[i];
+        str += "\n" + i + ". " + getUsername(client, players[i - 1]);
     }
 
     //filter to make sure message is a valid number in the list
@@ -23,7 +28,7 @@ function askMove(client, targetId, numChoices, players, callback){
         })
         .then((message) => {
             console.log("UserId " + targetId + " responded with: " + message.values().next().value.content);
-            callback(message.values().next().value.content); //TODO
+            callback(players[parseInt(message.values().next().value.content) - 1]); //TODO
         })
    });
     
