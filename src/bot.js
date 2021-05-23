@@ -1,7 +1,4 @@
 require('dotenv').config();
-var dmmm = require('./modules/dm')
-//prefix const
-const PREFIX = "tos";
 
 //making new discord bot client
 const { Client } = require('discord.js');
@@ -28,7 +25,7 @@ let players = new Map();
 
 
 //when a message is sent
-client.on('message', (message) =>{
+client.on('message', (message) => {
    
 
     var id = message.author.discriminator;
@@ -43,14 +40,29 @@ client.on('message', (message) =>{
 
             if (players.get(id) != null) {
                 message.channel.send("Name: " + players.get(id).user.username);
+                message.channel.send("Role: " + players.get(id).role);
                 message.channel.send("Alive: " + players.get(id).isAlive);
             }
         }
 
         else if (args[0] === "kill") {
             if (args.length > 1 && players.get(args[1]) != null) {   
-                players.get(args[1]).isAlive = false;
-                //message.channel.send(args[1] + " was killed! D:");
+                
+                if (players.get(id).data.atk > players.get(id).data.def) {
+                    players.get(args[1]).isAlive = false;
+                    message.channel.send(args[1] + " was killed! D:");
+                }
+                else {
+                    message.channel.send(args[1] + "'s defence was too strong!");
+                }
+
+            }
+        }
+
+        else if (args[0] === "role") {
+            if (args.length > 1) {   
+                players.get(id).setRole(args[1]);
+                console.log(players.get(id).data);
 
             }
         }
