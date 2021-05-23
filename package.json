@@ -4,10 +4,17 @@
   "description": "",
   "main": "app.js",
   "dependencies": {
+    "awesome-typescript-loader": "^5.2.1",
     "discord.js": "^12.5.3",
-    "dotenv": "^10.0.0"
+    "dotenv": "^10.0.0",
+    "source-map-loader": "^3.0.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "nodemon": "^2.0.7",
+    "ts-node": "^10.0.0",
+    "typescript": "^2.7.2",
+    "webpack": "^5.0.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
