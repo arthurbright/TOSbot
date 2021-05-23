@@ -18,7 +18,9 @@ client.on('ready', () => {
 //when a message is sent
 client.on('message', (message) =>{
     if(message.content === 'dm'){
-        dmmm(client);
+        dmmm(client, (msg) =>{
+            console.log(msg);
+        });
         
     }
 
