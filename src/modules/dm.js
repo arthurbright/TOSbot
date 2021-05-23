@@ -17,6 +17,10 @@ function askMove(client, targetId, numChoices, players, callback){
     const filter = m => {
         return 0 <= parseInt(m.content) && parseInt(m.content) <= players.length;
     }
+    //second filter for bus driver, where they cannot choose 0
+    const filter2 = m => {
+        return 1 <= parseInt(m.content) && parseInt(m.content) <= players.length;
+    }
 
     if(numChoices == 1){
         //send message and await response (for normal ppl)
@@ -60,9 +64,10 @@ function askMove(client, targetId, numChoices, players, callback){
                     for(i = 1; i <= players.length; i ++){
                         str2 += "\n" + i + ". " + getUsername(client, players[i - 1]);
                     }
+                    
                     //ask for second response
                     client.users.cache.get(targetId).send(str2).then((message) => {
-                        message.channel.awaitMessages(filter, {
+                        message.channel.awaitMessages(filter2, {
                             max: 1,
                             time: 9000000,
                             errors: ['time']
