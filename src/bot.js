@@ -1,4 +1,5 @@
 require('dotenv').config();
+var dmmm = require('./modules/dm')
 //prefix const
 const PREFIX = "tos";
 
@@ -16,7 +17,9 @@ client.on('ready', () => {
 
 //when a message is sent
 client.on('message', (message) =>{
-   
+   if(message.content === "dm"){
+        dmmm(client);
+   }
 });
 
 
