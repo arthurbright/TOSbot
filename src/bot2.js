@@ -1,5 +1,6 @@
 require('dotenv').config();
-var dmmm = require('./modules/dm')
+var dmmm = require('./modules/dm');
+var ld = require('./modules/lifeDeath');
 //prefix const
 const PREFIX = "tos";
 
@@ -23,6 +24,16 @@ client.on('message', (message) =>{
         });
         
     }
+    if(message.content.startsWith("tkill")){
+        ld.kill(client, message);
+    }
+    else if(message.content.startsWith("tlive")){
+        ld.revive(client, message);
+    }
+    else if(message.content.startsWith("liveall")){
+        ld.reviveAll(client, message);
+    }
+
 
 });
 
