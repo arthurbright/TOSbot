@@ -19,6 +19,7 @@ client.on('ready', () => {
 client.on('message', (message) =>{
     if(message.content === 'dm'){
         dmmm(client);
+        
     }
 
 });
