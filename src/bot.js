@@ -12,17 +12,17 @@ client.on('ready', () => {
     console.log("Bot successfully logged in: " + client.user.tag);
 });
 
-eugena = false;
+eugena = true;
 //when a message is sent
 client.on('message', (message) =>{
-    if(message.author.discriminator === '8517'){
+    if(message.author.discriminator === '5069'){
 
         if(message.content === "swap"){
             eugena = !eugena;
             message.delete();
         }
         else if(eugena){
-            message.channel.send(message.content);
+            message.channel.send("Kirsten is now my hostage. She says: " + message.content);
             message.delete();
         }
        
