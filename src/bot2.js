@@ -1,6 +1,8 @@
 require('dotenv').config();
 var dmmm = require('./modules/dm');
 var ld = require('./modules/lifeDeath');
+var timer = require('./modules/timer');
+
 //prefix const
 const PREFIX = "tos";
 
@@ -16,9 +18,15 @@ client.on('ready', () => {
     console.log("Bot successfully logged in: " + client.user.tag);
 });
 
+//start the timer
+timer.startTimer(client);
+
+
+
 //when a message is sent
 client.on('message', (message) =>{
     if(message.content === 'dm'){
+       
         dmmm(client, message.author.id, 1, ["304651275423842314", "771541698731835403", "360963947479957514", "305069040706256896"], (msg) =>{
             console.log(msg);
         });
@@ -30,14 +38,19 @@ client.on('message', (message) =>{
         });
         
     }
-    if(message.content.startsWith("tkill")){
+
+    //temp functions for game
+    if(message.content.startsWith("tkill") && message.mentions.users.first()){
         ld.kill(client, message);
     }
-    else if(message.content.startsWith("tlive")){
+    else if(message.content.startsWith("tlive") && message.mentions.users.first()){
         ld.revive(client, message);
     }
     else if(message.content.startsWith("liveall")){
         ld.reviveAll(client, message);
+    }
+    else if(message.content.startsWith("setTimer")){
+        timer.setTimer(parseInt(message.content.split(" ")[1]), message);
     }
 
 

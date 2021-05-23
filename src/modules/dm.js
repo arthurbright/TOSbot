@@ -36,6 +36,7 @@ function askMove(client, targetId, numChoices, players, callback){
                 console.log("UserId " + targetId + " responded with: " + message.values().next().value.content);
                 //if 0 response
                 if(message.values().next().value.content === '0'){
+                    client.users.cache.get(targetId).send("You have chosen to skip tonight.");
                     callback(0);
                 }
                 else{
@@ -64,6 +65,7 @@ function askMove(client, targetId, numChoices, players, callback){
             .then((message) => {
                 //if zero response
                 if(message.values().next().value.content === '0'){
+                    client.users.cache.get(targetId).send("You have chosen to skip tonight.");
                     callback([0, 0]);
                 }
                 else{
