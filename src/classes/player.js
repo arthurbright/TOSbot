@@ -4,8 +4,8 @@ class Player {
         this.id = id;
         this.user = user;
         this.isAlive = true;
-        this.attack = 0;
-        this.defense = 0;
+        this.atk = 0;
+        this.def = 0;
 
 
         this.role = "";
@@ -13,9 +13,14 @@ class Player {
 
 
 
-    if (this.role == "") {
-        
+    setRole(role) {
+        this.role = role;
+        atk 
+
     }
+
+
+    
 
 }
 

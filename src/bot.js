@@ -19,7 +19,7 @@ client.on('ready', () => {
 
 
 // Player Class
-const Player = require('./player.js');
+const Player = require('./classes/player.js');
 
 let players = new Map();
 

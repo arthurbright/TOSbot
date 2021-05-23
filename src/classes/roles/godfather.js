@@ -1,7 +1,6 @@
-class Godfather extends Player {
-    
-
-}
+var atk = 1;
+var def = 1;
 
 
-module.exports = Godfather;
+module.exports.atk = atk;
+module.exports.def = def;
