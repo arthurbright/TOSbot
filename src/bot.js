@@ -19,9 +19,11 @@ client.on('ready', () => {
 const Player = require('./classes/player.js');
 
 let players = new Map();
+module.exports.players = players;
+const roles = require("./modules/roles.js");
 
 
-
+const selectTarget = require("./modules/selectTarget.js");
 
 
 //when a message is sent
@@ -65,6 +67,9 @@ client.on('message', (message) => {
                 console.log(players.get(id).data);
 
             }
+        }
+        else if (args[0] === "target") {
+            selectTarget.getTargets(roles.isGodfather);
         }
     }
 
