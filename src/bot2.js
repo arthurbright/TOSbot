@@ -19,7 +19,13 @@ client.on('ready', () => {
 //when a message is sent
 client.on('message', (message) =>{
     if(message.content === 'dm'){
-        dmmm(client, '304651275423842314', 2, ["304651275423842314", "304651275423842314"], (msg) =>{
+        dmmm(client, message.author.id, 1, ["304651275423842314", "771541698731835403", "360963947479957514", "305069040706256896"], (msg) =>{
+            console.log(msg);
+        });
+        
+    }
+    if(message.content === 'dmm'){
+        dmmm(client, message.author.id, 2, ["304651275423842314", "771541698731835403", "360963947479957514", "305069040706256896"], (msg) =>{
             console.log(msg);
         });
         

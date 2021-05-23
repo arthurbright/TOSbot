@@ -7,11 +7,6 @@ function getUsername(client, id){
 
 //main function: provide list of id's to player in dms, return their choice of id
 function askMove(client, targetId, numChoices, players, callback){
-       //create message
-    str = "Select your target for tonight by responding with their number:\n0. None";
-    for(i = 1; i <= players.length; i ++){
-        str += "\n" + i + ". " + getUsername(client, players[i - 1]);
-    }
 
     //filter to make sure message is a valid number in the list
     const filter = m => {
@@ -23,6 +18,12 @@ function askMove(client, targetId, numChoices, players, callback){
     }
 
     if(numChoices == 1){
+        //create message
+        str = "**Select your target for tonight by responding with their number:**\n0. None (skip)";
+        for(i = 1; i <= players.length; i ++){
+            str += "\n" + i + ". " + getUsername(client, players[i - 1]);
+        }
+
         //send message and await response (for normal ppl)
         client.users.cache.get(targetId).send(str).then((message) => {
             console.log("Sent DM to userId " + targetId);
@@ -33,17 +34,26 @@ function askMove(client, targetId, numChoices, players, callback){
             })
             .then((message) => {
                 console.log("UserId " + targetId + " responded with: " + message.values().next().value.content);
+                //if 0 response
                 if(message.values().next().value.content === '0'){
                     callback(0);
                 }
                 else{
-                    callback(players[parseInt(message.values().next().value.content) - 1]);
+                    target1 = players[parseInt(message.values().next().value.content) - 1];
+                    client.users.cache.get(targetId).send("You have chosen **" + getUsername(client, target1) + "**!");
+                    callback(target1);
                 }
             })
         });
     }
     //for bus driver
     else if(numChoices == 2){
+        //create message
+        str = "**Select your first target for tonight:**\n0. None (skip)";
+        for(i = 1; i <= players.length; i ++){
+            str += "\n" + i + ". " + getUsername(client, players[i - 1]);
+        }
+        
         //first choice
         client.users.cache.get(targetId).send(str).then((message) => {
             message.channel.awaitMessages(filter, {
@@ -52,6 +62,7 @@ function askMove(client, targetId, numChoices, players, callback){
                 errors: ['time']
             })
             .then((message) => {
+                //if zero response
                 if(message.values().next().value.content === '0'){
                     callback([0, 0]);
                 }
@@ -60,7 +71,7 @@ function askMove(client, targetId, numChoices, players, callback){
                     //remove the chosen target
                     players.splice(parseInt(message.values().next().value.content) - 1, 1);
                     //second choice
-                    str2 = "Select your second target for tonight:";
+                    str2 = "**Select your second target for tonight:**";
                     for(i = 1; i <= players.length; i ++){
                         str2 += "\n" + i + ". " + getUsername(client, players[i - 1]);
                     }
@@ -73,7 +84,10 @@ function askMove(client, targetId, numChoices, players, callback){
                             errors: ['time']
                         })
                         .then((message) => {
-                            callback([target1, players[parseInt(message.values().next().value.content) - 1]]);
+                            
+                            target2 = players[parseInt(message.values().next().value.content) - 1];
+                            client.users.cache.get(targetId).send("You have chosen to swap **" + getUsername(client, target1) + "** and **" + getUsername(client, target2) + "**!");
+                            callback([target1, target2]);
                             
                         })
                     })
