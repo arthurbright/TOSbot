@@ -1,4 +1,4 @@
-const bot = require("../bot.js");
+const bot = require("../bot.ts");
 const roles = require("./roles.js");
 
 

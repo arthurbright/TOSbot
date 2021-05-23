@@ -1,8 +1,8 @@
 {
-  "name": "Test",
+  "name": "tosbot",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "src/bot.js",
   "dependencies": {
     "awesome-typescript-loader": "^5.2.1",
     "discord.js": "^12.5.3",
@@ -15,8 +15,17 @@
     "typescript": "^2.7.2",
     "webpack": "^5.0.0"
   },
+<<<<<<< Updated upstream
+=======
+  "devDependencies": {
+    "@types/node": "^15.6.0",
+    "nodemon": "^2.0.7",
+    "ts-node": "^10.0.0",
+    "typescript": "^4.2.4"
+  },
+>>>>>>> Stashed changes
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "oi": "nodemon src/bot.ts"
   },
   "keywords": [],
   "author": "",

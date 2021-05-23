@@ -1,2 +1,2 @@
-nodemon src\bot.js
+nodemon src\bot.ts
 pause
