@@ -19,7 +19,7 @@ client.on('ready', () => {
 //when a message is sent
 client.on('message', (message) =>{
     if(message.content === 'dm'){
-        dmmm(client, '304651275423842314', 1, ["304651275423842314", "304651275423842314"], (msg) =>{
+        dmmm(client, '304651275423842314', 2, ["304651275423842314", "304651275423842314"], (msg) =>{
             console.log(msg);
         });
         
