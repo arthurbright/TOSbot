@@ -42,6 +42,8 @@ function revive(client, message){
         
     member.roles.add(roleAlive);
     member.roles.remove(roleDead);
+
+    message.channel.send(target.username + " has been revived!");
     message.delete();
 }
 
@@ -54,7 +56,7 @@ function reviveAll(client, message){
         member.roles.add(roleAlive);
         member.roles.remove(roleDead);
     } 
-
+    message.channel.send("*Shine once more, before the end.*  (~20s)");
     message.delete();
 }
 

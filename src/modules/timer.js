@@ -28,7 +28,7 @@ function startTimer(client){
 
 function setTimer(t, message){
     offset = Date.now()/1000 + t;
-    member = message.guild.members.cache.get('844065886541185074');
+    //member = message.guild.members.cache.get('844065886541185074');
     message.channel.send("**TIME REMAINING: " + t + " SECONDS**").then((m) =>{
         msg = m;
     })
