@@ -1,16 +1,29 @@
 const { Client } = require('discord.js');
 
-function kill(client, message){
-    target = message.mentions.users.first();
-    member = message.guild.members.cache.get(target.id);
-
-    var roleDead = message.guild.roles.cache.find((role) =>{
-        return role.name === "dead";
-    });
-
+//function to get the alive role
+function getAliveRole(message){
     var roleAlive = message.guild.roles.cache.find((role) =>{
         return role.name === "alive";
     });
+    return roleAlive;
+}
+
+//function to get the dead role
+function getDeadRole(message){
+    var roleDead = message.guild.roles.cache.find((role) =>{
+        return role.name === "dead";
+    });
+    return roleDead;
+}
+
+
+//kill a person
+function kill(message){
+    target = message.mentions.users.first();
+    member = message.guild.members.cache.get(target.id);
+
+    roleAlive = getAliveRole(message);
+    roleDead = getDeadRole(message);
         
     member.roles.remove(roleAlive);
     member.roles.add(roleDead);
@@ -19,43 +32,37 @@ function kill(client, message){
     message.delete();
 }
 
-function revive(client, message){
+//revive a person
+function revive(message){
     target = message.mentions.users.first();
     member = message.guild.members.cache.get(target.id);
 
-    var roleDead = message.guild.roles.cache.find((role) =>{
-        return role.name === "dead";
-    });
-
-    var roleAlive = message.guild.roles.cache.find((role) =>{
-        return role.name === "alive";
-    });
+    roleAlive = getAliveRole(message);
+    roleDead = getDeadRole(message);
         
     member.roles.add(roleAlive);
     member.roles.remove(roleDead);
+
+    message.channel.send(target.username + " has been revived!");
     message.delete();
 }
 
-function reviveAll(client, message){
-    var roleDead = message.guild.roles.cache.find((role) =>{
-        return role.name === "dead";
-    });
-
-    var roleAlive = message.guild.roles.cache.find((role) =>{
-        return role.name === "alive";
-    }); 
+//revive everyone
+function reviveAll(message){
+    roleAlive = getAliveRole(message);
+    roleDead = getDeadRole(message);
 
     for(member of message.guild.members.cache.values()){
         member.roles.add(roleAlive);
         member.roles.remove(roleDead);
     } 
-
+    message.channel.send("*Shine once more, before the end.*  (~20s)");
     message.delete();
 }
 
 
 
-
+//exports
 module.exports.kill = kill;
 module.exports.revive = revive;
 module.exports.reviveAll = reviveAll;
