@@ -1,14 +1,14 @@
 const { Client } = require('discord.js');
 offset = 0;
-member = null;
 msg = null;
 
 function updateTime(){
     time = Math.floor(offset - (Date.now()/1000));
     if(time < 0) time = 0;
     
-    if(member == null || msg == null){
+    if(msg == null){
         return;
+        
     }
     
     //set nickname method
@@ -22,10 +22,12 @@ function updateTime(){
     
 }
 
-function startTimer(client){
-    setInterval(updateTime, 1100);
+//start the looping updates
+function startTimer(){
+    setInterval(updateTime, 2000);
 }
 
+//set the timer to a certain time
 function setTimer(t, message){
     offset = Date.now()/1000 + t;
     //member = message.guild.members.cache.get('844065886541185074');
@@ -35,7 +37,13 @@ function setTimer(t, message){
     
 }
 
+//get the current time
+function getTime(){
+    return Math.floor(offset - (Date.now()/1000));
+}
+
 
 module.exports.startTimer = startTimer;
 module.exports.setTimer = setTimer;
+module.exports.getTime = getTime;
 

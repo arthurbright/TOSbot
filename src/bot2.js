@@ -2,6 +2,7 @@ require('dotenv').config();
 var dmmm = require('./modules/dm');
 var ld = require('./modules/lifeDeath');
 var timer = require('./modules/timer');
+var Vote = require('./modules/vote');
 
 //prefix const
 const PREFIX = "tos";
@@ -19,7 +20,7 @@ client.on('ready', () => {
 });
 
 //start the timer
-timer.startTimer(client);
+timer.startTimer();
 
 
 
@@ -41,16 +42,29 @@ client.on('message', (message) =>{
 
     //temp functions for game
     if(message.content.startsWith("tkill") && message.mentions.users.first()){
-        ld.kill(client, message);
+        ld.kill(message);
     }
     else if(message.content.startsWith("tlive") && message.mentions.users.first()){
-        ld.revive(client, message);
+        ld.revive(message);
     }
     else if(message.content.startsWith("liveall")){
-        ld.reviveAll(client, message);
+        ld.reviveAll(message);
     }
     else if(message.content.startsWith("setTimer")){
         timer.setTimer(parseInt(message.content.split(" ")[1]), message);
+    }
+    else if(message.content === "vote"){
+        Vote.sendVote(client, ['304651275423842314', "305069040706256896", "290320543973113858"], 69);
+    }
+    else if(message.content === "count"){
+        k = Vote.countVotes();
+        if(k == 0){
+            message.channel.send("No one voted out");
+        }
+        else{
+            message.channel.send("Voted out: " + client.users.cache.get(Vote.countVotes()).username);
+        }
+        
     }
 
 

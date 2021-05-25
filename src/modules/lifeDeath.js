@@ -18,7 +18,7 @@ function getDeadRole(message){
 
 
 //kill a person
-function kill(client, message){
+function kill(message){
     target = message.mentions.users.first();
     member = message.guild.members.cache.get(target.id);
 
@@ -33,7 +33,7 @@ function kill(client, message){
 }
 
 //revive a person
-function revive(client, message){
+function revive(message){
     target = message.mentions.users.first();
     member = message.guild.members.cache.get(target.id);
 
@@ -48,7 +48,7 @@ function revive(client, message){
 }
 
 //revive everyone
-function reviveAll(client, message){
+function reviveAll(message){
     roleAlive = getAliveRole(message);
     roleDead = getDeadRole(message);
 
