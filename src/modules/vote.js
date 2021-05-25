@@ -1,19 +1,23 @@
 const { Client } = require('discord.js');
 currMessages = [];
 ids = [];
+
+// Emojis
 const nooseThink = '839900389989679125';
 const mayor = 'Ⓜ️';
+
+// Channels
 //const votingChannel = '833755912064729118';
 const votingChannel = '758155951240642576';
 
 
-//id to username
+// Convert ID to Username
 function getUsername(client, id){
     return client.users.cache.get(id).username;
 }
 
 
-//takes in list of player ids and sets up poll
+// Takes in list of player ids and sets up poll
 async function sendVote(client, players, day){
     currMessages = [];
     ids = [];
@@ -36,8 +40,8 @@ async function sendVote(client, players, day){
     }
 }
 
-function countVotes(){
-    if(currMessages.length == 0){
+function countVotes() {
+    if (currMessages.length == 0) {
         return 0;
     }
     //count reactions on each message in the array
@@ -46,33 +50,30 @@ function countVotes(){
     max = -1;
     mostVoted = null;
 
-    for(i = 0; i < numPlayers; i ++){
+    for (let i = 0; i < numPlayers; i++) {
         count.push(0);
-        //count normal votes
-        if(currMessages[i].reactions.resolve(nooseThink) != null){
+        // Count normal votes
+        if (currMessages[i].reactions.resolve(nooseThink) != null){
             count[i] += 2 * currMessages[i].reactions.resolve(nooseThink).users.reaction.count;
         }
-        //count mayor vote
-        if(currMessages[i].reactions.resolve(mayor) != null){
+        // Count mayor vote
+        if (currMessages[i].reactions.resolve(mayor) != null){
             count[i] += 5;
         }
 
-        if(count[i] > max){
+        if (count[i] > max){
             max = count[i];
             mostVoted = ids[i];
         }
         
-
     }
 
-    if(max > numPlayers){
+    if (max > numPlayers) {
         return mostVoted
     }
-    else{
+    else {
         return 0;
     }
-
-    
 
 }
 
