@@ -28,13 +28,13 @@ timer.startTimer();
 client.on('message', (message) =>{
     if(message.content === 'dm'){
        
-        dmmm(client, message.author.id, 1, ["304651275423842314", "771541698731835403", "360963947479957514", "305069040706256896"], (msg) =>{
+        dmmm.askMove(client, message.author.id, 1, ["304651275423842314", "771541698731835403", "360963947479957514", "305069040706256896"], (msg) =>{
             console.log(msg);
         });
         
     }
     if(message.content === 'dmm'){
-        dmmm(client, message.author.id, 2, ["304651275423842314", "771541698731835403", "360963947479957514", "305069040706256896"], (msg) =>{
+        dmmm.askMove(client, message.author.id, 2, ["304651275423842314", "771541698731835403", "360963947479957514", "305069040706256896"], (msg) =>{
             console.log(msg);
         });
         
@@ -65,6 +65,11 @@ client.on('message', (message) =>{
             message.channel.send("Voted out: " + client.users.cache.get(Vote.countVotes()).username);
         }
         
+    }
+    else if(message.content === "vet"){
+        dmmm.askAlert(client, '304651275423842314', 2, (m) =>{
+            
+        })
     }
 
 

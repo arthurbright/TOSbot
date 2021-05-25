@@ -99,4 +99,29 @@ function askMove(client, targetId, numChoices, players, callback){
     }   
 }
 
-module.exports = askMove;
+function askAlert(client, targetId, alertsLeft, callback){
+    str = "Would you like to alert tonight? You have " + alertsLeft + " alerts left.\n**Respond 'yes' to alert, and 'no' otherwise.**";
+    const filter = m => {
+       return m.content === 'yes' || m.content === 'no';
+    }
+    client.users.cache.get(targetId).send(str).then((message) => {
+        message.channel.awaitMessages(filter, {
+            max: 1,
+            time: 9000000,
+            errors: ['time']
+        })
+        .then((message) => {
+            if(message.values().next().value.content === 'yes'){
+                client.users.cache.get(targetId).send("You are on alert!");
+                callback(1);
+            }
+            else{
+                client.users.cache.get(targetId).send("You are not on alert for tonight.");
+                callback(0);
+            }
+        })
+    });
+}
+
+module.exports.askMove = askMove;
+module.exports.askAlert = askAlert;
