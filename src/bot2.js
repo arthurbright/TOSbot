@@ -76,6 +76,12 @@ client.on('message', (message) =>{
             
         })
     }
+    else if(message.content.startsWith('testkill')){
+        ld.killPlayer(client, message.content.split(" ")[1], "methmatician");
+    }
+    else if(message.content === 'reviive'){
+        ld.reset(client);
+    }
 
 
 });
