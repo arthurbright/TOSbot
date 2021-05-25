@@ -71,6 +71,11 @@ client.on('message', (message) =>{
             
         })
     }
+    else if(message.content === "guard"){
+        dmmm.askVest(client, '304651275423842314', 1, (m) =>{
+            
+        })
+    }
 
 
 });

@@ -1,4 +1,5 @@
 const { Client } = require('discord.js');
+const graveyard = '833756094449975376';
 
 //function to get the alive role
 function getAliveRole(message){
@@ -28,6 +29,7 @@ function kill(message){
     member.roles.remove(roleAlive);
     member.roles.add(roleDead);
     
+    //channel = client.channels.cache.get(graveyard);
     message.channel.send(target.username + " was killed!");
     message.delete();
 }
@@ -43,6 +45,7 @@ function revive(message){
     member.roles.add(roleAlive);
     member.roles.remove(roleDead);
 
+    //channel = client.channels.cache.get(graveyard);
     message.channel.send(target.username + " has been revived!");
     message.delete();
 }
@@ -56,6 +59,8 @@ function reviveAll(message){
         member.roles.add(roleAlive);
         member.roles.remove(roleDead);
     } 
+
+    //channel = client.channels.cache.get(graveyard);
     message.channel.send("*Shine once more, before the end.*  (~20s)");
     message.delete();
 }

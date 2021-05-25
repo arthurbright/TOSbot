@@ -123,5 +123,30 @@ function askAlert(client, targetId, alertsLeft, callback){
     });
 }
 
+function askVest(client, targetId, vestsLeft, callback){
+    str = "Would you like to vest tonight? You have " + vestsLeft + " vests left.\n**Respond 'yes' to vest, and 'no' otherwise.**";
+    const filter = m => {
+       return m.content === 'yes' || m.content === 'no';
+    }
+    client.users.cache.get(targetId).send(str).then((message) => {
+        message.channel.awaitMessages(filter, {
+            max: 1,
+            time: 9000000,
+            errors: ['time']
+        })
+        .then((message) => {
+            if(message.values().next().value.content === 'yes'){
+                client.users.cache.get(targetId).send("You put on the vest!");
+                callback(1);
+            }
+            else{
+                client.users.cache.get(targetId).send("The vest is not used.");
+                callback(0);
+            }
+        })
+    });
+}
+
 module.exports.askMove = askMove;
 module.exports.askAlert = askAlert;
+module.exports.askVest = askVest;
