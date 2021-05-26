@@ -43,8 +43,14 @@ function getTime(){
     return Math.floor(offset - (Date.now()/1000));
 }
 
+function stopTimer(){
+    msg = null;
+}
+
+
 
 module.exports.startTimer = startTimer;
 module.exports.setTimer = setTimer;
 module.exports.getTime = getTime;
+module.exports.stopTimer = stopTimer;
 

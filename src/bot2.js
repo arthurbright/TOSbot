@@ -89,6 +89,12 @@ client.on('message', (message) =>{
     else if(message.content === 'dayyy'){
         Announce.announceDay(client, 420);
     }
+    else if(message.content === 'rev'){
+        Announce.revealMayor(client, '305069040706256896');
+    }
+    else if(message.content === 'clearTown'){
+        Announce.clearTown(client);
+    }
 
 
 
