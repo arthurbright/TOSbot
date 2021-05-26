@@ -3,6 +3,7 @@ var dmmm = require('./modules/dm');
 var ld = require('./modules/lifeDeath');
 var timer = require('./modules/timer');
 var Vote = require('./modules/vote');
+var Announce = require('./modules/announce');
 
 //prefix const
 const PREFIX = "tos";
@@ -51,7 +52,7 @@ client.on('message', (message) =>{
         ld.reviveAll(message);
     }
     else if(message.content.startsWith("setTimer")){
-        timer.setTimer(parseInt(message.content.split(" ")[1]), message);
+        timer.setTimer(client, parseInt(message.content.split(" ")[1]));
     }
     else if(message.content === "vote"){
         Vote.sendVote(client, ['304651275423842314', "305069040706256896", "290320543973113858"], 69);
@@ -85,6 +86,10 @@ client.on('message', (message) =>{
     else if(message.content === 'reviive'){
         ld.reset(client);
     }
+    else if(message.content === 'dayyy'){
+        Announce.announceDay(client, 420);
+    }
+
 
 
 });

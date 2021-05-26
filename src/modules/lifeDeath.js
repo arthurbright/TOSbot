@@ -2,6 +2,8 @@ const { Client } = require('discord.js');
 const graveyard = '833756094449975376';
 const guild = '758155951240642572';
 
+msgs = [];
+
 //function to get the alive role
 function getAliveRole(client){
     var roleAlive = client.guilds.cache.get(guild).roles.cache.find((role) =>{
@@ -67,7 +69,7 @@ function reviveAll(message){
 }
 
 //kill a person (api)
-function killPlayer(client, targetId, roleName){
+async function killPlayer(client, targetId, roleName){
     roleAlive = getAliveRole(client);
     roleDead = getDeadRole(client);
 
@@ -78,11 +80,11 @@ function killPlayer(client, targetId, roleName){
     member.roles.add(roleDead);
 
     channel = client.channels.cache.get(graveyard);
-    channel.send("**" + target.username + " was killed. They were a " + roleName + ".**");
+    msgs.push(await channel.send("**" + target.username + " was killed. They were a " + roleName + ".**"));
 }
 
 //revive all (api)
-function reset(client){
+async function reset(client){
     roleAlive = getAliveRole(client);
     roleDead = getDeadRole(client);
 
@@ -92,8 +94,17 @@ function reset(client){
     } 
 
     //channel = client.channels.cache.get(graveyard);
-    channel = client.channels.cache.get(graveyard)
-    channel.send("*Shine once more, before the end.*  (~20s)");
+    channel = client.channels.cache.get(graveyard);
+    //msgs.push(await channel.send("*Shine once more, before the end.*  (Reiving all, ~20s)"));
+    clearMsgs();
+}
+
+//clear graveyard messages
+async function clearMsgs(){
+    for(i = 0; i < msgs.length; i ++){
+        await msgs[i].delete();
+    }
+    msgs = [];
 }
 
 
@@ -104,3 +115,4 @@ module.exports.revive = revive;
 module.exports.reviveAll = reviveAll;
 module.exports.killPlayer = killPlayer;
 module.exports.reset = reset;
+module.exports.clearMsgs = clearMsgs;

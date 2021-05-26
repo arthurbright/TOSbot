@@ -1,6 +1,7 @@
 const { Client } = require('discord.js');
 offset = 0;
 msg = null;
+town = '833755900098379837';
 
 function updateTime(){
     time = Math.floor(offset - (Date.now()/1000));
@@ -28,10 +29,10 @@ function startTimer(){
 }
 
 //set the timer to a certain time
-function setTimer(t, message){
+function setTimer(client, t){
     offset = Date.now()/1000 + t;
     //member = message.guild.members.cache.get('844065886541185074');
-    message.channel.send("**TIME REMAINING: " + t + " SECONDS**").then((m) =>{
+    client.channels.cache.get(town).send("**TIME REMAINING: " + t + " SECONDS**").then((m) =>{
         msg = m;
     })
     
