@@ -66,6 +66,9 @@ client.on('message', (message) =>{
         }
         
     }
+    else if(message.content === "clearvote"){
+        Vote.clearVote();
+    }
     else if(message.content === "vet"){
         dmmm.askAlert(client, '304651275423842314', 2, (m) =>{
             

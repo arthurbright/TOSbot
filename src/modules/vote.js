@@ -1,14 +1,14 @@
 const { Client } = require('discord.js');
 currMessages = [];
 ids = [];
+mainMessage = null;
 
 // Emojis
 const nooseThink = '839900389989679125';
 const mayor = 'Ⓜ️';
 
 // Channels
-//const votingChannel = '833755912064729118';
-const votingChannel = '758155951240642576';
+const votingChannel = '833755912064729118';
 
 
 // Convert ID to Username
@@ -25,7 +25,7 @@ async function sendVote(client, players, day){
     //opening line
     channel = client.channels.cache.get(votingChannel);
     str = "**Voting options for day " + day + ":**";
-    await channel.send(str);
+    mainMessage = await channel.send(str);
 
     numPlayers = players.length;
 
@@ -77,5 +77,15 @@ function countVotes() {
 
 }
 
+function clearVote(){
+    mainMessage.delete();
+    
+
+    for(i = 0; i < currMessages.length; i ++){
+        currMessages[i].delete();
+    }
+}
+
 module.exports.sendVote = sendVote;
 module.exports.countVotes = countVotes;
+module.exports.clearVote = clearVote;
