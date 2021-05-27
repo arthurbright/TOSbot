@@ -147,6 +147,14 @@ function askVest(client, targetId, vestsLeft, callback){
     });
 }
 
+function dmRole(client, targetId, roleName){
+    client.users.cache.get(targetId).send("**Hello! Your role for this game is " + roleName);
+}
+
+function dmMessage(client, targetId, message){
+    client.users.cache.get(targetId).send(message);
+}
+
 module.exports.askMove = askMove;
 module.exports.askAlert = askAlert;
 module.exports.askVest = askVest;
