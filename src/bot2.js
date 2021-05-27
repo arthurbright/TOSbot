@@ -4,6 +4,7 @@ var ld = require('./modules/lifeDeath');
 var timer = require('./modules/timer');
 var Vote = require('./modules/vote');
 var Announce = require('./modules/announce');
+var Vc = require('./modules/vc');
 
 //prefix const
 const PREFIX = "tos";
@@ -94,6 +95,15 @@ client.on('message', (message) =>{
     }
     else if(message.content === 'clearTown'){
         Announce.clearTown(client);
+    }
+    else if(message.content === 'muteAll'){
+        Vc.muteAll(client);
+    }
+    else if(message.content === 'unmuteAll'){
+        Vc.unmuteAll(client);
+    }
+    else if(message.content === 'poj'){
+        message.channel.send("poj indeed");
     }
 
 
