@@ -37,7 +37,27 @@ function clearTown(client){
     })
 }
 
+function announceTownWin(client){
+    channel = client.channels.cache.get(town);
+    channel.send("Town has won!");
+}
+
+function announceMafiaWin(client){
+    channel = client.channels.cache.get(town);
+    channel.send("Mafia has won!");
+}
+
+function announceNeutralWin(client, rolename){
+    channel = client.channels.cache.get(town);
+    channel.send("The " + rolename + " has won!");
+}
+
+
+
 module.exports.announceDay = announceDay;
 module.exports.announceNight = announceNight;
 module.exports.revealMayor = revealMayor;
 module.exports.clearTown = clearTown;
+module.exports.announceTownWin = announceTownWin;
+module.exports.announceMafiaWin = announceMafiaWin;
+module.exports.announceNeutralWin = announceNeutralWin;

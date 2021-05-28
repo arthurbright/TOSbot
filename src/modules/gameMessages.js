@@ -76,8 +76,6 @@ const presets = {
     arsonist = {
         target = "You were ignited by an arsonist!"
     }
-
-
 }
 
 function consigMsg(roleName){
