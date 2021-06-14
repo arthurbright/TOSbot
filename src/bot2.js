@@ -130,6 +130,14 @@ client.on('message', (message) =>{
     }
 
 
+    else if(message.content === "pollstart"){
+        Announce.pollPlayers(client);
+    }
+    else if(message.content === "pollcount"){
+        Announce.getPlayers(client);
+    }
+
+
 });
 
 
