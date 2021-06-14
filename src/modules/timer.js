@@ -2,6 +2,7 @@ const { Client } = require('discord.js');
 offset = 0;
 msg = null;
 town = '833755900098379837';
+callback = null;
 
 function updateTime(){
     time = Math.floor(offset - (Date.now()/1000));
@@ -19,6 +20,8 @@ function updateTime(){
     }
     else{
         msg.edit("**TIME IS UP!**");
+        callback();
+        msg = null;
     }
     
 }
@@ -29,12 +32,13 @@ function startTimer(){
 }
 
 //set the timer to a certain time
-function setTimer(client, t){
+function setTimer(client, t, cback){
     offset = Date.now()/1000 + t;
     //member = message.guild.members.cache.get('844065886541185074');
     client.channels.cache.get(town).send("**TIME REMAINING: " + t + " SECONDS**").then((m) =>{
         msg = m;
-    })
+    });
+    callback = cback;
     
 }
 

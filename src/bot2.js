@@ -10,6 +10,7 @@ var Vc = require('./modules/vc');
 const PREFIX = "tos";
 
 //making new discord bot client
+const Discord = require('discord.js');
 const { Client } = require('discord.js');
 const client = new Client();
 
@@ -24,7 +25,7 @@ client.on('ready', () => {
 //start the timer
 timer.startTimer();
 
-
+beats = 195
 
 //when a message is sent
 client.on('message', (message) =>{
@@ -53,7 +54,9 @@ client.on('message', (message) =>{
         ld.reviveAll(message);
     }
     else if(message.content.startsWith("setTimer")){
-        timer.setTimer(client, parseInt(message.content.split(" ")[1]));
+        timer.setTimer(client, parseInt(message.content.split(" ")[1]), () =>{
+            console.log('time is up');
+        });
     }
     else if(message.content === "vote"){
         Vote.sendVote(client, ['304651275423842314', "305069040706256896", "290320543973113858"], 69);
@@ -106,6 +109,25 @@ client.on('message', (message) =>{
         message.channel.send("poj indeed");
     }
 
+
+    //for kevin bday :)
+    else if(message.content === "hb"){
+        message.channel.send(":tada: :tada: HAPPY 18th BIRTHDAY KEVIN!!!!!!!! :tada: :tada:")
+        message.delete();
+    }
+    else if(message.content === "punch"){
+        beats += 1;
+        message.channel.send("Kevin has recieved **" + beats + "** birthday beats.");
+    }
+    else if(message.content === "oog"){
+        let m = new Discord.MessageEmbed();
+        m.setTitle("DAY 3");
+        m.setDescription("Time left: xx s");
+        m.setColor('#ff1100');
+        
+        message.channel.send(m);
+        
+    }
 
 
 });
