@@ -1,80 +1,79 @@
-
 const presets = {
     /////////////////////////////////////TOWNSPEOPLE
-    bodyguard = {
-        you = "You were attacked while defending someone!",
-        target = "Someone tried to attack you, but someone fought off your attacker!"
+    bodyguard : {
+        you : "You were attacked while defending someone!",
+        target : "Someone tried to attack you, but someone fought off your attacker!"
     },
-    doctor = {
-        you = "Someone tried to attack your target, but you saved them!",
-        target = "Someone tried to attack you, but you were protected!"
+    doctor : {
+        you : "Someone tried to attack your target, but you saved them!",
+        target : "Someone tried to attack you, but you were protected!"
     },
-    mayor = {
+    mayor : {
         
     },
-    medium = {
+    medium : {
      
     },
-    escort = {
-        you = "You visited a serial killer! / Someone tried to role-block you!",
-        target = "You were role-blocked!"
+    escort : {
+        you : "You visited a serial killer! / Someone tried to role-block you!",
+        target : "You were role-blocked!"
     },
-    busDriver = {
-        target = "You were transported!"
+    busDriver : {
+        target : "You were transported!"
     },
-    sheriff = {
-        you = {
-            sus = "Your target is suspicious!",
-            notsus = "Your target is not suspicious!"
+    sheriff : {
+        you : {
+            sus : "Your target is suspicious!",
+            notsus : "Your target is not suspicious!"
         }
     },
-    lookout = {
-        you = "",
+    lookout : {
+        you : "",
     },
-    tracker = {
-        you = "",
+    tracker : {
+        you : "",
     },
-    veteran = {
-        you = "At least one person visited you while you were on alert!",
-        target = "You were shot visiting a veteran on alert!"
+    veteran : {
+        you : "At least one person visited you while you were on alert!",
+        target : "You were shot visiting a veteran on alert!"
     },
-    vigilante = {
-        you = {
-            suicide = "You committed suicide!",
-            defence = "Your target's defence was too high!"
+    vigilante : {
+        you : {
+            suicide : "You committed suicide!",
+            defence : "Your target's defence was too high!"
         },
-        target = "You were shot by a vigilante."
+        target : "You were shot by a vigilante."
     },
 
 
     ///////////////////////////////////////////////////MAFIA
-    godfather = {
-        you = "Your target's defence was too high!",
-        target = "You were killed by the godfather."
+    godfather : {
+        you : "Your target's defence was too high!",
+        target : "You were killed by the godfather."
     },
-    mafioso = {
-        you = "Your target's defence was too high!",
-        target = "You were killed by the godfather."
+    mafioso : {
+        you : "Your target's defence was too high!",
+        target : "You were killed by the godfather."
     },
-    consigliere = {
-        you = ""
+    consigliere : {
+        you : ""
     },
-    consort = {
-        you = "You visited a serial killer!",
-        target = "You were role-blocked!"
+    consort : {
+        you : "You visited a serial killer!",
+        target : "You were role-blocked!"
     },
 
 
     ///////////////////////////////////////////////////////NEUTRALS                                                                  
-    jester = {
+    jester : {
 
     },
-    serialKiller = {
-        you = "Your target's defence was too high!",
-        target = "You were stabbed to death by a serial killer!"
+    serialKiller : {
+        you : "Your target's defence was too high!",
+        target : "You were stabbed to death by a serial killer!"
     },
-    arsonist = {
-        target = "You were ignited by an arsonist!"
+    arsonist : {
+        target : "You were ignited by an arsonist!"
     }
 }
 

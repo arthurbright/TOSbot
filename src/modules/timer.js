@@ -8,7 +8,7 @@ function updateTime(){
     time = Math.floor(offset - (Date.now()/1000));
     if(time < 0) time = 0;
     
-    if(msg == null){
+    if(msg == null || msg.deleted){
         return;
         
     }

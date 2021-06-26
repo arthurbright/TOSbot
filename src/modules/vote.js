@@ -17,7 +17,7 @@ function getUsername(client, id){
 }
 
 
-// Takes in list of player ids and sets up poll
+// Takes in array of player ids and sets up poll
 async function sendVote(client, players, day){
     currMessages = [];
     ids = [];
