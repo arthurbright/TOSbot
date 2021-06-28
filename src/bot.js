@@ -13,10 +13,17 @@ const Timer = require('./modules/timer.js');
 const Vc = require('./modules/vc.js');
 const Vote = require('./modules/vote.js');
 const GameMessages = require('./modules/gameMessages.js');
+const roles = require("./modules/roles.js");
+const rolegen = require("./modules/rolegen.js");
+//const selectTarget = require("./modules/selectTarget.js");
 
+
+// Player Class
+const Player = require('./classes/player.js');
 
 //start timer periodic function
 Timer.startTimer();
+
 
 //making new discord bot client
 const { Client } = require('discord.js');
@@ -30,17 +37,11 @@ client.on('ready', () => {
 
 
 
-// Player Class
-//const Player = require('./classes/player.js');
 
 let players = new Map();
 module.exports.players = players;
-let users = [];
-//const roles = require("./modules/roles.js");
 
-
-
-//const selectTarget = require("./modules/selectTarget.js");
+gameOver = false;
 
 
 //when a message is sent
@@ -97,8 +98,21 @@ client.on('message', (message) => {
         }
 
         if(args[1] === "start"){
-            users = Announce.getPlayers(client); //TODO, temporary; this gets an array of all players playing
+            //get all players in the players map
+            let users =  Announce.getPlayers(client); //array of all players who reacted to start message
+            for(let i = 0; i < users.length; i ++){
+                players.set(users[i], new Player(users[i], client.users.cache.get(users[i])));
+            }
+
+            //assign roles TODO
+            for(let i = 0; i < users.length; i ++){
+                players.get(users[i]).setRole("Mayor"); //debug line
+            }
+
+            //start the first day
+            gameOver = false;
             startDay();
+            console.log(players);
         }
 
         if(args[1] === "clear"){
@@ -106,51 +120,137 @@ client.on('message', (message) => {
         }
     }
 
+    //mayor reveal
+    if(message.content === "I reveal" && day == true && players.get(message.author.id).role === "Mayor"){
+        Announce.sendTown(client, client.users.cache.get(message.author.id).username +  " has officially revealed themselves as the Mayor!");
+
+    }
+
 
 
 });
 
 dayNum = 1;
+day = true;
+
 
 //day cycle
 function startDay(){
+    day = true;
+
     Announce.announceDay(client, dayNum, () =>{
         //end of day cycle
         channel = client.channels.cache.get(town);
-        channel.send( Vote.countVotes() + " was lynched");
+        let lynchee = Vote.countVotes();
+        if(lynchee != 0){
+            //lynch someone!
+            Ld.lynch(client, lynchee, players.get(lynchee).role);
+
+            if(players.get(lynchee).role === "Jester"){
+                endgame("jester");
+            }
+
+            players.delete(lynchee);
+
+        }
+        else{
+            Announce.sendTown(client, "No one was lynched today!");
+        }
         Vote.clearVote();
         
 
-        checkWin();
-        startNight();
+        //important: these two if statements MUST be separate
+        if(!gameOver){
+            checkWin();
+        }
+        if(!gameOver){
+            startNight();
+        }
     });
 
-
+    //start of day cycle
     Vc.unmuteAll(client);
     Vote.sendVote(client, users, dayNum);
 }
 
 //night cycle
 function startNight(){
-    
+    day = false;
     Announce.announceNight(client, dayNum, () =>{
         //end of night cycle
         
 
 
-        checkWin();
-        startDay();
-        
+
+        if(!gameOver){
+            checkWin();
+        }
+        if(!gameOver){
+            startDay();
+        }
     });
+    //start of night cycle
     dayNum ++;
-    
     Vc.muteAll(client);
+
+    //dm people for their moves
+    for(let player of players.values()){
+        
+    }
+
 
 }
 
+
+
+
+
 //checks if the game is over based on who is still alive
 function checkWin(){
+    //if mafia is equal to or more than half (?)
 
+    //if only town left
+    let townWin = true;
+    for(let player of players.values()){
+        if(!(player.data.alignment === "Town")){
+            townWin = false;
+        }
+    }
+    if(townWin){
+        endgame("town");
+    }
+
+
+    //if only one neutral left (not jester)   ////note: jester needs separate win code!
+    if(players.size == 1 && players.values().next().value.data.alignment == "Neutral"){
+        endgame(players.values().next().value.role);
+    }
+
+}
+
+
+
+function endgame(winner){
+    gameOver = true;
+    Timer.stopTimer();
+    Ld.clearMsgs;
+    players = new Map();
+    dayNum = 1;
+    Ld.reset(client);
+
+    //do perms for mafia and medium TODO
+
+    if(winner === "mafia"){
+        Announce.announceMafiaWin(client);
+    }
+    else if(winner === "town"){
+        Announce.announceTownWin(client);
+    }
+    //if a neutral wins, pass winner = role name
+    else{
+        Announce.announceNeutralWin(client, winner);
+    }
+    
 }
 
 

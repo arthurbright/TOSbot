@@ -7,6 +7,10 @@ const town = '833755900098379837'
 // Emojis
 const nooseThink = '839900389989679125';
 
+function sendTown(client, message){
+    channel = client.channels.cache.get(town);
+    channel.send(message);
+}
 
 async function announceDay(client, num, cback){
     channel = client.channels.cache.get(town);
@@ -26,18 +30,7 @@ async function revealMayor(client, targetId){
     await channel.send("**" + client.users.cache.get(targetId).username + " **has officially revealed themselves as mayor!");
 }
 
-function clearTown(client){
-    //stop timer, to prevent error
-    Timer.stopTimer();
-    channel = client.channels.cache.get(town);
-    channel.messages.fetch({limit: 100}).then(messages =>{
-        for(let msg of messages.values()){
-            if(!(msg.id === '846949433291571221')){
-                msg.delete();
-            }
-        }
-    })
-}
+
 
 //game end/start announcements
 function announceTownWin(client){
@@ -87,7 +80,19 @@ function getPlayers(client){
 
 }
 
-
+function clearTown(client){
+    //stop timer, to prevent error
+    pollMessage = null;
+    Timer.stopTimer();
+    channel = client.channels.cache.get(town);
+    channel.messages.fetch({limit: 100}).then(messages =>{
+        for(let msg of messages.values()){
+            if(!(msg.id === '846949433291571221')){
+                msg.delete();
+            }
+        }
+    })
+}
 
 module.exports.announceDay = announceDay;
 module.exports.announceNight = announceNight;
@@ -98,3 +103,4 @@ module.exports.announceMafiaWin = announceMafiaWin;
 module.exports.announceNeutralWin = announceNeutralWin;
 module.exports.pollPlayers = pollPlayers;
 module.exports.getPlayers = getPlayers;
+module.exports.sendTown = sendTown;

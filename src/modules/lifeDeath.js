@@ -68,7 +68,7 @@ function reviveAll(message){
     message.delete();
 }
 
-//kill a person (api)
+//kill a person (api) and send message in graveyard
 async function killPlayer(client, targetId, roleName){
     roleAlive = getAliveRole(client);
     roleDead = getDeadRole(client);
@@ -81,6 +81,21 @@ async function killPlayer(client, targetId, roleName){
 
     channel = client.channels.cache.get(graveyard);
     msgs.push(await channel.send("**" + target.username + " was killed. They were a " + roleName + ".**"));
+}
+
+//lynch a person (api) and send message in graveyard
+async function lynch(client, targetId, roleName){
+    roleAlive = getAliveRole(client);
+    roleDead = getDeadRole(client);
+
+    target = client.users.cache.get(targetId);
+    member = client.guilds.cache.get(guild).members.cache.get(targetId);
+
+    member.roles.remove(roleAlive);
+    member.roles.add(roleDead);
+
+    channel = client.channels.cache.get(graveyard);
+    msgs.push(await channel.send("**" + target.username + " was lynched. They were a " + roleName + ".**"));
 }
 
 //revive all (api)
@@ -116,3 +131,4 @@ module.exports.reviveAll = reviveAll;
 module.exports.killPlayer = killPlayer;
 module.exports.reset = reset;
 module.exports.clearMsgs = clearMsgs;
+module.exports.lynch = lynch;
