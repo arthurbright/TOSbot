@@ -79,18 +79,21 @@ function getPlayers(client){
 
 }
 
-function clearTown(client){
+async function clearTown(client){
     //stop timer, to prevent error
     pollMessage = null;
     Timer.stopTimer();
-    channel = client.channels.cache.get(town);
-    channel.messages.fetch({limit: 100}).then(messages =>{
-        for(let msg of messages.values()){
-            if(!(msg.id === '846949433291571221')){
-                msg.delete();
-            }
-        }
-    })
+    let channel = client.channels.cache.get(town);
+
+    let fetched;
+    do {
+        fetched = await channel.messages.fetch({limit: 100});
+        channel.bulkDelete(fetched);
+    }
+    while(fetched.size >= 2);
+    
+
+    channel.send("Link to all QZ TOS stuff can be found on this spreadsheet: https://docs.google.com/spreadsheets/d/1zwt9nlO-yL4k66AEmCt1nEkj2_CFdKm4aiPvjqEjNog/edit?usp=drive_web&ouid=109648472470184497419");
 }
 
 module.exports.announceDay = announceDay;

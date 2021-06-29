@@ -2,8 +2,13 @@ require('dotenv').config();
 
 //prefix
 const prefix = "tos";
-//town channel constant
-const town = '833755900098379837'
+//channel constants
+const town = '833755900098379837';
+const mafiaChannel = '833755959745577040';
+const deadSea = '841847192184422430';
+const guild = '758155951240642572';
+const botId = '844065886541185074';
+
 
 //import functions from other files
 const Dm = require('./modules/dm.js');
@@ -26,7 +31,7 @@ Timer.startTimer();
 
 
 //making new discord bot client
-const { Client } = require('discord.js');
+const { Client, Guild } = require('discord.js');
 const client = new Client();
 //bot login, bot goes online
 client.login(process.env.DISCORDJS_BOT_TOKEN);
@@ -106,7 +111,7 @@ client.on('message', (message) => {
 
             //assign roles TODO ROLEGEN + DM ROLES TO PLAYERS
             for(let i = 0; i < users.length; i ++){
-                players.get(users[i]).setRole("Bus Driver"); //debug line
+                players.get(users[i]).setRole("Medium"); //debug line
             }
 
             //start the first day
@@ -115,8 +120,7 @@ client.on('message', (message) => {
         }
 
         if(args[1] === "clear"){
-            Announce.clearTown(client);
-            Ld.clearGraveyard(client);
+            resetChannels();
         }
     }
 
@@ -169,6 +173,8 @@ function startDay(){
     });
 
     //start of day cycle
+    closeMedium();
+    closeMafia();
     Vc.unmuteAll(client);
     Vote.sendVote(client, getPlayerIds(), dayNum);
 }
@@ -199,6 +205,8 @@ function startNight(){
     });
     ///////////////////////////////////////////start of night cycle
     dayNum ++;
+    openMedium();
+    openMafia();
     Vc.muteAll(client);
 
     //storage for ppls moves
@@ -415,6 +423,74 @@ function promoteMafioso(){
 function promote(id){
     players.get(id).setRole("Mafioso");
     Dm.dmMessage(client, id, "**You have been promoted to Mafioso!**");
+}
+
+function openMafia(){
+    let channel = client.channels.cache.get(mafiaChannel);
+    for(let player of players.values()){
+        if(player.data.alignment === "Mafia"){
+            channel.updateOverwrite(player.id, {VIEW_CHANNEL: true});
+        }
+    }
+}
+
+function closeMafia(){
+    let channel = client.channels.cache.get(deadSea);
+    channel.overwritePermissions([
+        {
+            id: guild,
+            deny: ['VIEW_CHANNEL']
+        },
+        {
+            id: botId,
+            allow: ['VIEW_CHANNEL', 'MANAGE_CHANNELS']
+        }
+    ])
+}
+
+function openMedium(){
+    let channel = client.channels.cache.get(deadSea);
+    for(let player of players.values()){
+        if(player.role === "Medium"){
+            channel.updateOverwrite(player.id, {VIEW_CHANNEL: true});
+        }
+    }
+}
+
+function closeMedium(){
+    let channel = client.channels.cache.get(deadSea);
+    channel.overwritePermissions([
+        {
+            id: guild,
+            deny: ['VIEW_CHANNEL']
+        },
+        {
+            id: botId,
+            allow: ['VIEW_CHANNEL', 'MANAGE_CHANNELS']
+        },
+        //allowing dead ppl to talk still
+        {
+            id: '833756181985886280',
+            allow: ['VIEW_CHANNEL']
+        }
+    ])
+}
+
+function resetChannels(){
+    Announce.clearTown(client);
+    Ld.clearGraveyard(client);
+
+    //clear mafia channel
+    let _mafia = client.channels.cache.get(mafiaChannel);
+    _mafia.messages.fetch({limit: 100}).then(messages =>{
+        _mafia.bulkDelete(messages);
+    })
+    
+    //clear deadsea
+    let _deadSea = client.channels.cache.get(deadSea);
+    _deadSea.messages.fetch({limit: 100}).then(messages =>{
+        _deadSea.bulkDelete(messages);
+    })
 }
 
 

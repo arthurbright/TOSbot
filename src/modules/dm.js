@@ -181,7 +181,6 @@ function askBusDriver(client, targetId, players, callback){
             errors: ['time']
         })
         .then((message) => {
-            console.log(error);
             //if 0 response
             let args = message.values().next().value.content.split(" ");
             if(args[0] === "0"){
@@ -197,6 +196,7 @@ function askBusDriver(client, targetId, players, callback){
         })
         .catch(message =>{
             callback([0, 1]);
+            console.log("bad");
         });
     });
     

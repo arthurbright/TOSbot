@@ -116,11 +116,9 @@ async function reset(client){
 
 //clear graveyard messages
 function clearGraveyard(client){
-    channel = client.channels.cache.get(graveyard);
+    let channel = client.channels.cache.get(graveyard);
     channel.messages.fetch({limit: 100}).then(messages =>{
-        for(let msg of messages.values()){
-            msg.delete();
-        }
+        channel.bulkDelete(messages);
     })
 }
 
