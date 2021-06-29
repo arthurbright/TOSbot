@@ -29,7 +29,7 @@ function askMove(client, targetId, numChoices, players, callback){
             console.log("Sent DM to userId " + targetId);
             message.channel.awaitMessages(filter, {
                 max: 1,
-                time: 9000000,
+                time: 299000,
                 errors: ['time']
             })
             .then((message) => {
@@ -59,7 +59,7 @@ function askMove(client, targetId, numChoices, players, callback){
         client.users.cache.get(targetId).send(str).then((message) => {
             message.channel.awaitMessages(filter, {
                 max: 1,
-                time: 9000000,
+                time: 299000,
                 errors: ['time']
             })
             .then((message) => {
@@ -82,7 +82,7 @@ function askMove(client, targetId, numChoices, players, callback){
                     client.users.cache.get(targetId).send(str2).then((message) => {
                         message.channel.awaitMessages(filter2, {
                             max: 1,
-                            time: 9000000,
+                            time: 299000,
                             errors: ['time']
                         })
                         .then((message) => {
@@ -107,7 +107,7 @@ function askAlert(client, targetId, alertsLeft, callback){
     client.users.cache.get(targetId).send(str).then((message) => {
         message.channel.awaitMessages(filter, {
             max: 1,
-            time: 9000000,
+            time: 299000,
             errors: ['time']
         })
         .then((message) => {
@@ -131,7 +131,7 @@ function askVest(client, targetId, vestsLeft, callback){
     client.users.cache.get(targetId).send(str).then((message) => {
         message.channel.awaitMessages(filter, {
             max: 1,
-            time: 9000000,
+            time: 299000,
             errors: ['time']
         })
         .then((message) => {
@@ -158,3 +158,5 @@ function dmMessage(client, targetId, message){
 module.exports.askMove = askMove;
 module.exports.askAlert = askAlert;
 module.exports.askVest = askVest;
+module.exports.dmRole = dmRole;
+module.exports.dmMessage = dmMessage;

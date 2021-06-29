@@ -170,7 +170,7 @@ function startDay(){
 
     //start of day cycle
     Vc.unmuteAll(client);
-    Vote.sendVote(client, users, dayNum);
+    Vote.sendVote(client, getPlayerIds(), dayNum);
 }
 
 //night cycle
@@ -178,7 +178,8 @@ function startNight(){
     day = false;
     Announce.announceNight(client, dayNum, () =>{
         //end of night cycle
-        
+        //CALCULATIONS
+        //NOTE: if doctor decides to not save anyone, store prevId as -1, not 0.
 
 
 
@@ -189,14 +190,81 @@ function startNight(){
             startDay();
         }
     });
-    //start of night cycle
+    ///////////////////////////////////////////start of night cycle
     dayNum ++;
     Vc.muteAll(client);
 
+    //storage for ppls moves
+    let nightActions = new Map();
+    
     //dm people for their moves
     for(let player of players.values()){
-        
+        //exceptions (veteran, bus driver, bodyguard, vigilante, arsonist, doctor)
+        if(player.role === "Veteran" && player.data.alerts > 0){
+            Dm.askAlert(client, player.id, player.data.alerts, (_alert)=>{
+                if(_alert == 1){
+                    player.data.alerts -= 1;
+                }
+                nightActions.set(player.id, _alert);
+            });
+        }
+        else if(player.role === "Bus Driver"){
+            Dm.askMove(client, player.id, 2, getPlayerIds(), (targets)=>{
+                nightActions.set(player.id, targets);
+            });
+        }
+        else if(player.role === "Vigilante" && player.data.bullets > 0){
+            Dm.askMove(client, player.id, 1, getPlayerIds().filter(item => item !== player.id), (target)=>{
+                nightActions.set(player.id, target);
+                if(target != 0){
+                    player.data.bullets -= 1;
+                }
+            });
+            
+        }
+        else if(player.role === "Doctor"){
+            Dm.askMove(client, player.id, 1, getPlayerIds().filter(item => item !== player.data.prevId), (target)=>{
+                nightActions.set(player.id, target);
+            });
+        }
+        else if(player.role === "Bodyguard"){
+            //todo
+        }
+        else if(player.role === "Arsonist"){
+            //todo
+        }
+
+
+        //asking mafia members who cannot choose each other
+        else if(player.role === "Consort" || player.role === "Consigliere" || 
+                player.role === "Mafioso" /*todo GODFATHER CONDITIONS. For now, mafioso always kills*/){
+
+            Dm.askMove(client, player.id, 1, getNonMafia(), (target) =>{
+                nightActions.set(player.id, target);
+            });
+        }
+
+
+        //asking people who can unconditionally choose someone excluding themselves
+        else if(player.role === "Escort" || player.role === "Sheriff" || player.role === "Tracker" ||
+                player.role === "Serial Killer"){
+
+            Dm.askMove(client, player.id, 1, getPlayerIds().filter(item => item !== player.id), (target)=>{
+                nightActions.set(player.id, target);
+            });
+        }
+
+
+        //asking people who can unconditionally choose someone else INCLUDING themselves
+        else if(player.role === "Lookout"){
+
+            Dm.askMove(client, player.id, 1, getPlayerIds(), (target)=>{
+                nightActions.set(player.id, target);
+            });
+        }
     }
+
+    
 
 
 }
@@ -207,7 +275,17 @@ function startNight(){
 
 //checks if the game is over based on who is still alive
 function checkWin(){
-    //if mafia is equal to or more than half (?)
+
+    //if only mafia left
+    let mafiaWin = true;
+    for(let player of players.values()){
+        if(!(player.data.alignment === "Mafia")){
+            mafiaWin = false;
+        }
+    }
+    if(mafiaWin){
+        endgame("mafia");
+    }
 
     //if only town left
     let townWin = true;
@@ -251,6 +329,27 @@ function endgame(winner){
         Announce.announceNeutralWin(client, winner);
     }
     
+}
+
+
+//function that returns all alive player ids in an array
+function getPlayerIds(){
+    let arr = [];
+    for(let playerId of players.keys()){
+        arr.push(playerId);
+    }
+    return arr;
+}
+
+//returns an array of all alive non-mafia players
+function getNonMafia(){
+    let arr = [];
+    for(let player of players.values()){
+        if(player.data.alignment !== "Mafia"){
+            arr.push(player.id);
+        }
+    }
+    return arr;
 }
 
 
