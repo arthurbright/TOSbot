@@ -104,26 +104,26 @@ client.on('message', (message) => {
                 players.set(users[i], new Player(users[i], client.users.cache.get(users[i])));
             }
 
-            //assign roles TODO
+            //assign roles TODO ROLEGEN + DM ROLES TO PLAYERS
             for(let i = 0; i < users.length; i ++){
-                players.get(users[i]).setRole("Mayor"); //debug line
+                players.get(users[i]).setRole("Bus Driver"); //debug line
             }
 
             //start the first day
             gameOver = false;
             startDay();
-            console.log(players);
         }
 
         if(args[1] === "clear"){
             Announce.clearTown(client);
+            Ld.clearGraveyard(client);
         }
     }
 
     //mayor reveal
-    if(message.content === "I reveal" && day == true && players.get(message.author.id).role === "Mayor"){
+    if(message.content === "reveal" && day == true && players.get(message.author.id).role === "Mayor" && !players.get(message.author.id).data.revealed){
         Announce.sendTown(client, client.users.cache.get(message.author.id).username +  " has officially revealed themselves as the Mayor!");
-
+        players.get(message.author.id).data.revealed = true;
     }
 
 
@@ -157,7 +157,7 @@ function startDay(){
             Announce.sendTown(client, "No one was lynched today!");
         }
         Vote.clearVote();
-        
+        promoteMafioso();
 
         //important: these two if statements MUST be separate
         if(!gameOver){
@@ -181,8 +181,15 @@ function startNight(){
         //CALCULATIONS
         //NOTE: if doctor decides to not save anyone, store prevId as -1, not 0.
 
+        //Priority 1
+        //REMEMBER TO INCLUDE VIGILANTE SUICIDE
 
 
+
+
+
+
+        promoteMafioso();
         if(!gameOver){
             checkWin();
         }
@@ -209,7 +216,7 @@ function startNight(){
             });
         }
         else if(player.role === "Bus Driver"){
-            Dm.askMove(client, player.id, 2, getPlayerIds(), (targets)=>{
+            Dm.askBusDriver(client, player.id, getPlayerIds(), (targets)=>{
                 nightActions.set(player.id, targets);
             });
         }
@@ -228,16 +235,20 @@ function startNight(){
             });
         }
         else if(player.role === "Bodyguard"){
-            //todo
+            Dm.askBodyGuard(client, player.id, getPlayerIds().filter(item => item!== player.id), player.data.vests, (response)=>{
+                nightActions.set(player.id, response);
+            });
         }
         else if(player.role === "Arsonist"){
-            //todo
+            Dm.askArsonist(client, player.id, getPlayerIds().filter(item => item !== player.id), (response)=>{
+                nightActions.set(player.id, response);
+            });
         }
 
 
         //asking mafia members who cannot choose each other
         else if(player.role === "Consort" || player.role === "Consigliere" || 
-                player.role === "Mafioso" /*todo GODFATHER CONDITIONS. For now, mafioso always kills*/){
+                player.role === "Mafioso" || (player.role === "Godfather" && noMafioso())){
 
             Dm.askMove(client, player.id, 1, getNonMafia(), (target) =>{
                 nightActions.set(player.id, target);
@@ -295,7 +306,7 @@ function checkWin(){
         }
     }
     if(townWin){
-        endgame("town");
+        //endgame("town");
     }
 
 
@@ -311,7 +322,6 @@ function checkWin(){
 function endgame(winner){
     gameOver = true;
     Timer.stopTimer();
-    Ld.clearMsgs;
     players = new Map();
     dayNum = 1;
     Ld.reset(client);
@@ -350,6 +360,61 @@ function getNonMafia(){
         }
     }
     return arr;
+}
+
+
+//function that checks if a mafioso is alive
+function noMafioso(){
+    let mafiosoAlive = false;
+    for(let player of players.values()){
+        if(player.role === "Mafioso"){
+            mafiosoAlive = true;
+        }
+    }
+    return !mafiosoAlive;
+}
+
+//function that checks if godfather is alive
+function noGodfather(){
+    let godfatherAlive = false;
+    for(let player of players.values()){
+        if(player.role === "Godfather"){
+            godfatherAlive = true;
+        }
+    }
+    return !godfatherAlive;
+}
+
+//checks if a mafioso promotion is in order
+function promoteMafioso(){
+    if(noMafioso() && noGodfather()){
+        //promote at random
+        //first, find all candidates
+        let candidates = [];
+        for(let player of players.values()){
+            if(player.data.alignment === "Mafia"){
+                candidates.push(player.id);
+            }
+        }
+
+
+        //if no mafia left
+        if(candidates.length == 0){
+            return;
+        }
+        else if(candidates.length == 1){
+            promote(candidates[0]);
+        }
+        else{
+            promote(candidates[Math.floor(Math.random() * candidates.length)]);
+        }
+    }
+}
+
+//actually promotes someone to mafioso
+function promote(id){
+    players.get(id).setRole("Mafioso");
+    Dm.dmMessage(client, id, "**You have been promoted to Mafioso!**");
 }
 
 

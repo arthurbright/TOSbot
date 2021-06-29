@@ -13,7 +13,7 @@ roleInfo.set("Sheriff", {alignment: "Town", subfaction: "Investigative", def: 0,
 roleInfo.set("Lookout", {alignment: "Town", subfaction: "Investigative", def: 0, atk: 0});
 roleInfo.set("Tracker", {alignment: "Town", subfaction: "Investigative", def: 0, atk: 0});
 roleInfo.set("Veteran", {alignment: "Town", subfaction: "Killing", def: 0, atk: 0, alerts: 2});
-roleInfo.set("Vigilante", {alignment: "Town", subfaction: "Killing", def: 0, atk: 1, bullets: 2});
+roleInfo.set("Vigilante", {alignment: "Town", subfaction: "Killing", def: 0, atk: 1, bullets: 2, suicidal: false});
 
 
 roleInfo.set("Godfather", {alignment: "Mafia", subfaction: "Killing", def: 1, atk: 1});

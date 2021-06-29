@@ -111,15 +111,17 @@ async function reset(client){
     //channel = client.channels.cache.get(graveyard);
     channel = client.channels.cache.get(graveyard);
     //msgs.push(await channel.send("*Shine once more, before the end.*  (Reiving all, ~20s)"));
-    clearMsgs();
+    clearGraveyard(client);
 }
 
 //clear graveyard messages
-async function clearMsgs(){
-    for(i = 0; i < msgs.length; i ++){
-        await msgs[i].delete();
-    }
-    msgs = [];
+function clearGraveyard(client){
+    channel = client.channels.cache.get(graveyard);
+    channel.messages.fetch({limit: 100}).then(messages =>{
+        for(let msg of messages.values()){
+            msg.delete();
+        }
+    })
 }
 
 
@@ -130,5 +132,5 @@ module.exports.revive = revive;
 module.exports.reviveAll = reviveAll;
 module.exports.killPlayer = killPlayer;
 module.exports.reset = reset;
-module.exports.clearMsgs = clearMsgs;
+module.exports.clearGraveyard = clearGraveyard;
 module.exports.lynch = lynch;

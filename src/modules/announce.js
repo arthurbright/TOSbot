@@ -73,7 +73,6 @@ function getPlayers(client){
     for(let user of pollMessage.reactions.resolve(nooseThink).users.cache.keys()){
         users.push(user);
     }
-    console.log(users);
     return users;
    
     
