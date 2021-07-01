@@ -111,7 +111,7 @@ async function reset(client){
     //channel = client.channels.cache.get(graveyard);
     channel = client.channels.cache.get(graveyard);
     //msgs.push(await channel.send("*Shine once more, before the end.*  (Reiving all, ~20s)"));
-    clearGraveyard(client);
+    //clearGraveyard(client);
 }
 
 //clear graveyard messages

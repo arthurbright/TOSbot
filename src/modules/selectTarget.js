@@ -1,4 +1,4 @@
-const bot = require("../bot.ts");
+const bot = require("../bot.js");
 const roles = require("./roles.js");
 
 
@@ -25,8 +25,16 @@ function getTargets(matcher) {
     }
 
     console.log(targets);
+    return targets;
 
 
 }
 
+function allRole(role){
+    return getTargets(player => {
+        return player.role === role;
+    })
+}
+
 module.exports.getTargets = getTargets;
+module.exports.allRole = allRole;

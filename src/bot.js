@@ -20,7 +20,7 @@ const Vote = require('./modules/vote.js');
 const GameMessages = require('./modules/gameMessages.js');
 const roles = require("./modules/roles.js");
 const rolegen = require("./modules/rolegen.js");
-//const selectTarget = require("./modules/selectTarget.js");
+const selectTarget = require("./modules/selectTarget.js");
 
 
 // Player Class
@@ -182,18 +182,170 @@ function startDay(){
 //night cycle
 function startNight(){
     day = false;
+    //storage for ppls moves
+    let nightActions = new Map();
+
+    //storage for who visited who
+    let visit = new Map();
+    let visited = new Map();
+
     Announce.announceNight(client, dayNum, () =>{
         //end of night cycle
+
+        //TODO: reset temp fields for each player: blocked, tattack, tdefense, as well as
+        //visited and visit maps
+        for(let player of players.values()){
+            player.data.blocked = false;
+            player.data.tattack = 0;
+            player.data.tdefense = 0;
+            visit.set(player, []);
+            visited.set(player, []);
+        }
+
         //CALCULATIONS
         //NOTE: if doctor decides to not save anyone, store prevId as -1, not 0.
+        //NOTE: "vet" stores the id of the ALERT vet. if he is not alert, it will be -2;
+        let vet = "-2";
+        let vetKill = false;
 
         //Priority 1
-        //REMEMBER TO INCLUDE VIGILANTE SUICIDE
+        //veteran
+        for(let playerId of selectTarget.allRole("Veteran")){
+            let action = nightActions.get(playerId);
+            if(action == 1){
+                vet = playerId;
+            }
+        }
+
+        //bus driver
+        for(let playerId of selectTarget.allRole("Bus Driver")){
+            let action = nightActions.get(playerId);
+            if(actions[0] != 0){
+                //update visits
+                visit.get(playerId).push(actions[0]);
+                visit.get(playerId).push(actions[1]);
+                visited.get(actions[0]).push(playerId);
+                visited.get(actions[1]).push(playerId);
+
+                //check vet
+                if(action[0] === vet || action[1] === vet){
+                    Ld.killPlayer(client, playerId, "Bus Driver");
+                    players.delete(playerId);
+                    vetKill = true;
+                }
+
+                //swap all actions bewtween the players with id actions[0] and actions[1]
+                for(let [id, _nightAction] of nightActions.entries()){
+                    //for double input actions
+                    if(typeof(_nightAction) === 'object'){
+                        if(_nightAction[0] === actions[0]){
+                            nightActions.set(id, [actions[1], _nightAction[1]]);
+                        }
+                        else if(_nightAction[0] === actions[1]){
+                            nightActions.set(id, [actions[0], _nightAction[1]]);
+                        }
+
+                        if(_nightAction[1] === actions[0]){
+                            nightActions.set(id, [_nightAction[0], actions[1]]);
+                        }
+                        else if(_nightAction[1] === actions[1]){
+                            nightActions.set(id, [_nightAction[0], actions[0]]);
+                        }
+                        
+                    }
+                    //for single input actions
+                    else if(typeof(_nightAction) === 'string'){
+                        if(_nightAction === actions[0]){
+                            nightActions.set(id, actions[1]);
+                        }
+                        else if(_nightAction === actions[1]){
+                            nightActions.set(id, actions[0]);
+                        }
+                    }
+                }
+
+            }
+        }
+
+        //vigilante suicide
+        for(let playerId of selectTarget.allRole("Vigilante")){
+            if(players.get(playerId).data.suicidal == true){
+                Ld.killPlayer(client, playerId);
+                players.delete(playerId);
+            }
+        }
+
+        //consort blocking
+        for(let playerId of selectTarget.allRole("Consort")){
+            let action = nightActions.get(playerId);
+            if(action != 0){
+                //update visits
+                visit.get(playerId).push(action);
+                visited.get(action).push(playerId);
+
+                //check if target alive
+                if(!players.has(action)){
+                    continue;
+                }
+
+                if(players.get(action).role === "Serial Killer"){
+                    Ld.killPlayer(client, playerId, "Consort");
+                    players.delete(playerId);
+                }
+                else if(action === vet){
+                    Ld.killPlayer(client, playerId, "Consort");
+                    players.delete(playerId);
+                    vetKill = true;
+                }
+                else{
+                    players.get(action).data.blocked = true;
+                }
+            }
+        }
+
+        //escort blocking
+        for(let playerId of selectTarget.allRole("Escort")){
+            let action = nightActions.get(playerId);
+            //check if they took an action
+            if(action != 0){
+
+                //check if they were role-blocked
+                if(players.get(playerId).data.blocked == true){
+                    continue;
+                }
+
+                //update visits
+                visit.get(playerId).push(action);
+                visited.get(action).push(playerId);
+
+                //check if target is dead
+                if(!players.has(action)){
+                    continue;
+                }
+
+                //check for serial killer/alert vet
+                if(players.get(action).role === "Serial Killer"){
+                    Ld.killPlayer(client, playerId, "Escort");
+                    players.delete(playerId);
+                }
+                else if(action === vet){
+                    Ld.killPlayer(client, playerId, "Escort");
+                    players.delete(playerId);
+                    vetKill = true;
+                }
+                else{
+                    players.get(action).data.blocked = true;
+                }
+            }
+        }
+
+        
 
 
 
 
 
+        //END NIGHT ACTION
 
         promoteMafioso();
         if(!gameOver){
@@ -209,8 +361,7 @@ function startNight(){
     openMafia();
     Vc.muteAll(client);
 
-    //storage for ppls moves
-    let nightActions = new Map();
+    
     
     //dm people for their moves
     for(let player of players.values()){
@@ -492,5 +643,7 @@ function resetChannels(){
         _deadSea.bulkDelete(messages);
     })
 }
+
+
 
 
