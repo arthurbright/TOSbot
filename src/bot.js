@@ -504,7 +504,7 @@ function checkWin(){
 
         //cases
         if(remaining % 2 == 1){
-            endgame("Arsonist"); //TODO(?) check if other player is doused
+            endgame("Arsonist"); 
         }
         else if((remaining / 2) % 2 == 1){
             endgame("Serial Killer");
