@@ -474,6 +474,55 @@ function checkWin(){
         endgame(players.values().next().value.role);
     }
 
+    //stalemate breaking
+    if(players.size == 2){
+        //frequency list of remaining roles
+        //1        2            4         8       16        32
+        //arsonist serialkiller godfather mafioso busdriver escort
+        let remaining = 0;
+        
+        for(let player of players.values()){
+            if(player.role === "Arsonist"){
+                remaining += 1;
+            }
+            else if(player.role === "Serial Killer"){
+                remaining += 2;
+            }
+            else if(player.role === "Godfather"){
+                remaining += 4;
+            }
+            else if(player.role === "Mafioso"){
+                remaining += 8;
+            }
+            else if(player.role === "Bus Driver"){
+                remaining += 16;
+            }
+            else if(player.role === "Escort"){
+                remaining += 32;
+            }
+        }
+
+        //cases
+        if(remaining % 2 == 1){
+            endgame("Arsonist");
+        }
+        else if((remaining / 2) % 2 == 1){
+            endgame("Serial Killer");
+        }
+        else if((remaining/4) % 2 == 1){
+            endgame("mafia");
+        }
+        else if(remaining == 24){
+            endgame("town")
+        }
+        else if(remaining == 40){
+            endgame("mafia");
+        }
+        
+
+
+    }
+
 }
 
 
