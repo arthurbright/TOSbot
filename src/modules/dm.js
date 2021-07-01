@@ -196,7 +196,6 @@ function askBusDriver(client, targetId, players, callback){
         })
         .catch(message =>{
             callback([0, 1]);
-            console.log("bad");
         });
     });
     
@@ -208,17 +207,17 @@ function askArsonist(client, targetId, players, callback){
     const filter = m => {
         let args = m.content.split(" ");
         //if they pass or ignite,, no second parameter needed
-        if(args[0] === "0" || args[0] === "2"){
+        if(args[0] === "skip" || args[0] === "ignite"){
             return true;
         }
-        else if(args[0] === "1"){
+        else if(args[0] === "douse"){
             return (1 <= parseInt(args[1]) && parseInt(args[1]) <= players.length);
         }
         return false;
     }
     
     //create message
-    str = "**Respond '0' to skip. Respond '1 x' to douse someone, where x is the desired target. Respond '2' to ignite.**";
+    str = "**Respond 'skip' to skip. Respond 'douse x' to douse someone, where x is the desired target. Respond 'ignite' to ignite.**";
     for(i = 1; i <= players.length; i ++){
         str += "\n" + i + ". " + getUsername(client, players[i - 1]);
     }
@@ -234,11 +233,11 @@ function askArsonist(client, targetId, players, callback){
         .then((message) => {
             //if 0 response
             let args = message.values().next().value.content.split(" ");
-            if(args[0] === "0"){
+            if(args[0] === "skip"){
                 client.users.cache.get(targetId).send("You have chosen to skip tonight.");
                 callback([0, 0]);
             }
-            else if(args[0] === "2"){
+            else if(args[0] === "ignite"){
                 client.users.cache.get(targetId).send("**They shall burn.**");
                 callback([2, 0]);
             }
@@ -264,7 +263,7 @@ function askBodyGuard(client, targetId, players, vestsLeft, callback){
     }
     
     //create message
-    str = "**Respond 'X Y'. X = 1 if you vest and 0 otherwise. Y = your target. If you do not want to protect anyone, Y = 0.**\nYou have " + vestsLeft + " vests left.";
+    str = "**Respond 'X Y'. X = 1 if you vest and 0 otherwise. Y = your target.**\nYou have " + vestsLeft + " vests left.\n0. None";
     for(i = 1; i <= players.length; i ++){
         str += "\n" + i + ". " + getUsername(client, players[i - 1]);
     }
