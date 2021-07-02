@@ -545,14 +545,14 @@ function endgame(winner){
     //do perms for mafia and medium TODO
 
     if(winner === "mafia"){
-        Announce.announceMafiaWin(client);
+        Announce.announceWin(client, "Mafia");
     }
     else if(winner === "town"){
-        Announce.announceTownWin(client);
+        Announce.announceWin(client, "Town");
     }
     //if a neutral wins, pass winner = role name
     else{
-        Announce.announceNeutralWin(client, winner);
+        Announce.announceWin(client, winner);
     }
     
 }
