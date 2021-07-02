@@ -19,7 +19,7 @@ const Vc = require('./modules/vc.js');
 const Vote = require('./modules/vote.js');
 const GameMessages = require('./modules/gameMessages.js');
 const roles = require("./modules/roles.js");
-const rolegen = require("./modules/rolegen.js");
+const Rolegen = require("./modules/rolegen.js");
 const selectTarget = require("./modules/selectTarget.js");
 
 
@@ -109,9 +109,11 @@ client.on('message', (message) => {
                 players.set(users[i], new Player(users[i], client.users.cache.get(users[i])));
             }
 
-            //assign roles TODO ROLEGEN + DM ROLES TO PLAYERS
+            //assign roles and dm roles to players
+            let roleList = selectTarget.shuffle(Rolegen.generateRoles(users.length));
             for(let i = 0; i < users.length; i ++){
-                players.get(users[i]).setRole("Medium"); //debug line
+                players.get(users[i]).setRole(roleList[i]);
+                Dm.dmRole(client, users[i], roleList[i]);
             }
 
             //start the first day
@@ -121,6 +123,11 @@ client.on('message', (message) => {
 
         if(args[1] === "clear"){
             resetChannels();
+        }
+
+        //debug functions
+        if(args[1] === "gen"){
+            console.log(Rolegen.generateRoles(1));
         }
     }
 
@@ -151,14 +158,14 @@ function startDay(){
             Ld.lynch(client, lynchee, players.get(lynchee).role);
 
             if(players.get(lynchee).role === "Jester"){
-                endgame("jester");
+                endgame("Jester");
             }
 
             players.delete(lynchee);
 
         }
         else{
-            Announce.sendTown(client, "No one was lynched today!");
+            Announce.sendTown(client, "**No one was lynched today!**");
         }
         Vote.clearVote();
         promoteMafioso();
@@ -195,31 +202,29 @@ function startNight(){
         //TODO: reset temp fields for each player: blocked, tattack, tdefense, as well as
         //visited and visit maps
         for(let player of players.values()){
-            player.data.blocked = false;
             player.data.tattack = 0;
             player.data.tdefense = 0;
             visit.set(player, []);
             visited.set(player, []);
+
         }
 
         //CALCULATIONS
-        //NOTE: if doctor decides to not save anyone, store prevId as -1, not 0.
-        //NOTE: "vet" stores the id of the ALERT vet. if he is not alert, it will be -2;
-        let vet = "-2";
-        let vetKill = false;
-
         //Priority 1
-        //veteran
-        for(let playerId of selectTarget.allRole("Veteran")){
+
+
+        let vet = "-2";
+         //veteran (EXECUTES NO MATTER WHAT)
+         for(let playerId of selectTarget.allRole("Veteran")){
             let action = nightActions.get(playerId);
             if(action == 1){
                 vet = playerId;
             }
         }
 
-        //bus driver
+        //bus driver (EXECUTES NO MATTER WHAT)
         for(let playerId of selectTarget.allRole("Bus Driver")){
-            let action = nightActions.get(playerId);
+            let actions = nightActions.get(playerId);
             if(actions[0] != 0){
                 //update visits
                 visit.get(playerId).push(actions[0]);
@@ -227,12 +232,7 @@ function startNight(){
                 visited.get(actions[0]).push(playerId);
                 visited.get(actions[1]).push(playerId);
 
-                //check vet
-                if(action[0] === vet || action[1] === vet){
-                    Ld.killPlayer(client, playerId, "Bus Driver");
-                    players.delete(playerId);
-                    vetKill = true;
-                }
+                
 
                 //swap all actions bewtween the players with id actions[0] and actions[1]
                 for(let [id, _nightAction] of nightActions.entries()){
@@ -264,16 +264,24 @@ function startNight(){
                     }
                 }
 
+                //check if they visited veteran
+                TODOTODO oogabooga;
             }
         }
 
-        //vigilante suicide
+
+        //NOTE: if doctor decides to not save anyone, store prevId as -1, not 0.
+        //NOTE: "vet" stores the id of the ALERT vet. if he is not alert, it will be -2;
+
+
+        //vigilante suicide (EXECUTES NO MATTER WHAT)
         for(let playerId of selectTarget.allRole("Vigilante")){
             if(players.get(playerId).data.suicidal == true){
                 Ld.killPlayer(client, playerId);
                 players.delete(playerId);
             }
         }
+
 
         //consort blocking
         for(let playerId of selectTarget.allRole("Consort")){
@@ -345,7 +353,7 @@ function startNight(){
 
 
 
-        //END NIGHT ACTION
+        //NIGHT LOGIC ENDS HERE
 
         promoteMafioso();
         if(!gameOver){
@@ -474,6 +482,55 @@ function checkWin(){
         endgame(players.values().next().value.role);
     }
 
+    //stalemate breaking
+    if(players.size == 2){
+        //frequency list of remaining roles
+        //1        2            4         8       16        32
+        //arsonist serialkiller godfather mafioso busdriver escort
+        let remaining = 0;
+        
+        for(let player of players.values()){
+            if(player.role === "Arsonist"){
+                remaining += 1;
+            }
+            else if(player.role === "Serial Killer"){
+                remaining += 2;
+            }
+            else if(player.role === "Godfather"){
+                remaining += 4;
+            }
+            else if(player.role === "Mafioso"){
+                remaining += 8;
+            }
+            else if(player.role === "Bus Driver"){
+                remaining += 16;
+            }
+            else if(player.role === "Escort"){
+                remaining += 32;
+            }
+        }
+
+        //cases
+        if(remaining % 2 == 1){
+            endgame("Arsonist"); 
+        }
+        else if((remaining / 2) % 2 == 1){
+            endgame("Serial Killer");
+        }
+        else if((remaining/4) % 2 == 1){
+            endgame("mafia");
+        }
+        else if(remaining == 24){
+            endgame("town")
+        }
+        else if(remaining == 40){
+            endgame("mafia");
+        }
+        
+
+
+    }
+
 }
 
 
@@ -586,7 +643,7 @@ function openMafia(){
 }
 
 function closeMafia(){
-    let channel = client.channels.cache.get(deadSea);
+    let channel = client.channels.cache.get(mafiaChannel);
     channel.overwritePermissions([
         {
             id: guild,
