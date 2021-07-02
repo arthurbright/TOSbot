@@ -158,14 +158,14 @@ function startDay(){
             Ld.lynch(client, lynchee, players.get(lynchee).role);
 
             if(players.get(lynchee).role === "Jester"){
-                endgame("jester");
+                endgame("Jester");
             }
 
             players.delete(lynchee);
 
         }
         else{
-            Announce.sendTown(client, "No one was lynched today!");
+            Announce.sendTown(client, "**No one was lynched today!**");
         }
         Vote.clearVote();
         promoteMafioso();
@@ -202,20 +202,26 @@ function startNight(){
         //TODO: reset temp fields for each player: blocked, tattack, tdefense, as well as
         //visited and visit maps
         for(let player of players.values()){
-            player.data.blocked = false;
             player.data.tattack = 0;
             player.data.tdefense = 0;
             visit.set(player, []);
             visited.set(player, []);
+
         }
 
         //CALCULATIONS
-        //NOTE: if doctor decides to not save anyone, store prevId as -1, not 0.
-        //NOTE: "vet" stores the id of the ALERT vet. if he is not alert, it will be -2;
-        let vet = "-2";
-        let vetKill = false;
-
         //Priority 1
+
+
+        let vet = "-2";
+         //veteran (EXECUTES NO MATTER WHAT)
+         for(let playerId of selectTarget.allRole("Veteran")){
+            let action = nightActions.get(playerId);
+            if(action == 1){
+                vet = playerId;
+            }
+        }
+
         //bus driver (EXECUTES NO MATTER WHAT)
         for(let playerId of selectTarget.allRole("Bus Driver")){
             let actions = nightActions.get(playerId);
@@ -226,14 +232,7 @@ function startNight(){
                 visited.get(actions[0]).push(playerId);
                 visited.get(actions[1]).push(playerId);
 
-                /*
-                //check vet
-                if(action[0] === vet || action[1] === vet){
-                    Ld.killPlayer(client, playerId, "Bus Driver");
-                    players.delete(playerId);
-                    vetKill = true;
-                }
-                */
+                
 
                 //swap all actions bewtween the players with id actions[0] and actions[1]
                 for(let [id, _nightAction] of nightActions.entries()){
@@ -265,17 +264,14 @@ function startNight(){
                     }
                 }
 
+                //check if they visited veteran
+                TODOTODO oogabooga;
             }
         }
 
-        //@kevin feel free to change up the rest of the night logic below
-         //veteran (EXECUTES NO MATTER WHAT)
-         for(let playerId of selectTarget.allRole("Veteran")){
-            let action = nightActions.get(playerId);
-            if(action == 1){
-                vet = playerId;
-            }
-        }
+
+        //NOTE: if doctor decides to not save anyone, store prevId as -1, not 0.
+        //NOTE: "vet" stores the id of the ALERT vet. if he is not alert, it will be -2;
 
 
         //vigilante suicide (EXECUTES NO MATTER WHAT)
@@ -357,7 +353,7 @@ function startNight(){
 
 
 
-        //END NIGHT ACTION
+        //NIGHT LOGIC ENDS HERE
 
         promoteMafioso();
         if(!gameOver){
