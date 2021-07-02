@@ -10,6 +10,7 @@ function shuffle(array) {
         array[i] = array[j];
         array[j] = temp;
     }
+    return array;
 }
 
 // Returns a list of targets that matches a certain criteria
@@ -38,3 +39,4 @@ function allRole(role){
 
 module.exports.getTargets = getTargets;
 module.exports.allRole = allRole;
+module.exports.shuffle = shuffle;

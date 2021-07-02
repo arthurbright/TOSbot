@@ -19,7 +19,7 @@ const Vc = require('./modules/vc.js');
 const Vote = require('./modules/vote.js');
 const GameMessages = require('./modules/gameMessages.js');
 const roles = require("./modules/roles.js");
-const rolegen = require("./modules/rolegen.js");
+const Rolegen = require("./modules/rolegen.js");
 const selectTarget = require("./modules/selectTarget.js");
 
 
@@ -109,9 +109,11 @@ client.on('message', (message) => {
                 players.set(users[i], new Player(users[i], client.users.cache.get(users[i])));
             }
 
-            //assign roles TODO ROLEGEN + DM ROLES TO PLAYERS
+            //assign roles and dm roles to players
+            let roleList = selectTarget.shuffle(Rolegen.generateRoles(users.length));
             for(let i = 0; i < users.length; i ++){
-                players.get(users[i]).setRole("Medium"); //debug line
+                players.get(users[i]).setRole(roleList[i]);
+                Dm.dmRole(client, users[i], roleList[i]);
             }
 
             //start the first day
@@ -121,6 +123,11 @@ client.on('message', (message) => {
 
         if(args[1] === "clear"){
             resetChannels();
+        }
+
+        //debug functions
+        if(args[1] === "gen"){
+            console.log(Rolegen.generateRoles(1));
         }
     }
 
@@ -209,17 +216,9 @@ function startNight(){
         let vetKill = false;
 
         //Priority 1
-        //veteran
-        for(let playerId of selectTarget.allRole("Veteran")){
-            let action = nightActions.get(playerId);
-            if(action == 1){
-                vet = playerId;
-            }
-        }
-
-        //bus driver
+        //bus driver (EXECUTES NO MATTER WHAT)
         for(let playerId of selectTarget.allRole("Bus Driver")){
-            let action = nightActions.get(playerId);
+            let actions = nightActions.get(playerId);
             if(actions[0] != 0){
                 //update visits
                 visit.get(playerId).push(actions[0]);
@@ -227,12 +226,14 @@ function startNight(){
                 visited.get(actions[0]).push(playerId);
                 visited.get(actions[1]).push(playerId);
 
+                /*
                 //check vet
                 if(action[0] === vet || action[1] === vet){
                     Ld.killPlayer(client, playerId, "Bus Driver");
                     players.delete(playerId);
                     vetKill = true;
                 }
+                */
 
                 //swap all actions bewtween the players with id actions[0] and actions[1]
                 for(let [id, _nightAction] of nightActions.entries()){
@@ -267,13 +268,24 @@ function startNight(){
             }
         }
 
-        //vigilante suicide
+        //@kevin feel free to change up the rest of the night logic below
+         //veteran (EXECUTES NO MATTER WHAT)
+         for(let playerId of selectTarget.allRole("Veteran")){
+            let action = nightActions.get(playerId);
+            if(action == 1){
+                vet = playerId;
+            }
+        }
+
+
+        //vigilante suicide (EXECUTES NO MATTER WHAT)
         for(let playerId of selectTarget.allRole("Vigilante")){
             if(players.get(playerId).data.suicidal == true){
                 Ld.killPlayer(client, playerId);
                 players.delete(playerId);
             }
         }
+
 
         //consort blocking
         for(let playerId of selectTarget.allRole("Consort")){
@@ -635,7 +647,7 @@ function openMafia(){
 }
 
 function closeMafia(){
-    let channel = client.channels.cache.get(deadSea);
+    let channel = client.channels.cache.get(mafiaChannel);
     channel.overwritePermissions([
         {
             id: guild,

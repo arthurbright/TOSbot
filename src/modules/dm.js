@@ -307,7 +307,7 @@ function askBodyGuard(client, targetId, players, vestsLeft, callback){
 
 
 function dmRole(client, targetId, roleName){
-    client.users.cache.get(targetId).send("**Hello! Your role for this game is " + roleName);
+    client.users.cache.get(targetId).send("**Your role for this game is " + roleName + "!**");
 }
 
 function dmMessage(client, targetId, message){
