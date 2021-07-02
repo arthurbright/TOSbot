@@ -25,11 +25,5 @@ roleInfo.set("Jester", {alignment: "Neutral", subfaction: "Evil", def: 0, atk: 0
 roleInfo.set("Serial Killer", {alignment: "Neutral", subfaction: "Killing", def: 0, atk: 0});
 roleInfo.set("Arsonist", {alignment: "Neutral", subfaction: "Killing", def: 0, atk: 0});
 
-function isGodfather(player) {
-    console.log(player);
-    console.log(player.role);
-    return (player.role === "Godfather");
-}
 
 module.exports.roleInfo = roleInfo;
-module.exports.isGodfather = isGodfather;
