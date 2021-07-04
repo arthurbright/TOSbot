@@ -18,6 +18,7 @@ async function announceDay(client, num, cback){
     let m = new Discord.MessageEmbed();
     m.setTitle("**It is now day " + num + ".**");
     m.setColor('#00f7ff');
+    m.setThumbnail('https://lh3.googleusercontent.com/proxy/xAz41zxuJ1zHiqgZIHX8fd2tQkAzNHQWIFWcNA4LfZCan6O04SGaBLxrhjJvQT7Pi8WVITQYqmwJ2S3zvVftsvvvsg_Me7U');
         
     await channel.send(m);
     Timer.setTimer(client, dayLength, cback);
@@ -28,6 +29,7 @@ async function announceNight(client, num, cback){
     let m = new Discord.MessageEmbed();
     m.setTitle("**It is now night " + num + ".**");
     m.setColor('#000fb3');
+    m.setImage('https://i.pinimg.com/originals/66/dc/a4/66dca49beb2de489397541e5fd414e40.png');
     
     await channel.send(m);
     Timer.setTimer(client, dayLength, cback);
@@ -60,6 +62,7 @@ async function pollPlayers(client){
     m.setTitle("**NEW GAME STARTING!**");
     m.setDescription("React with :noosethink: to join.")
     m.setColor('#00c724');
+    m.setThumbnail('https://linustechtips.com/uploads/monthly_2016_06/Fedora.png.09a1171bb34f97ac359174c208823451.png');
     pollMessage = await channel.send(m);
 }
 
