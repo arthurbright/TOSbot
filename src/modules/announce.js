@@ -1,4 +1,5 @@
 const { Client } = require('discord.js');
+const Discord = require('discord.js');
 const Timer = require('./timer.js');
 const dayLength = 20;
 
@@ -14,13 +15,21 @@ function sendTown(client, message){
 
 async function announceDay(client, num, cback){
     channel = client.channels.cache.get(town);
-    await channel.send("**It is now day " + num + ".**");
+    let m = new Discord.MessageEmbed();
+    m.setTitle("**It is now day " + num + ".**");
+    m.setColor('#00f7ff');
+        
+    await channel.send(m);
     Timer.setTimer(client, dayLength, cback);
 }
 
 async function announceNight(client, num, cback){
     channel = client.channels.cache.get(town);
-   await channel.send("**It is now night " + num + ".**");
+    let m = new Discord.MessageEmbed();
+    m.setTitle("**It is now night " + num + ".**");
+    m.setColor('#000fb3');
+    
+    await channel.send(m);
     Timer.setTimer(client, dayLength, cback);
 }
 
@@ -35,7 +44,10 @@ async function revealMayor(client, targetId){
 //game end/start announcements
 function announceWin(client, rolename){
     channel = client.channels.cache.get(town);
-    channel.send("The " + rolename + " has won!");
+    let m = new Discord.MessageEmbed();
+    m.setTitle("**The " + rolename + " has won!**");
+    m.setColor('#00c724');
+    channel.send(m);
 }
 
 
@@ -44,7 +56,11 @@ pollMessage = null;
 
 async function pollPlayers(client){
     channel = client.channels.cache.get(town);
-    pollMessage = await channel.send("NEW GAM STARTING! React to play (dont actually react this is a test)");
+    let m = new Discord.MessageEmbed();
+    m.setTitle("**NEW GAME STARTING!**");
+    m.setDescription("React with :noosethink: to join.")
+    m.setColor('#00c724');
+    pollMessage = await channel.send(m);
 }
 
 //get a list of users that have reacted to the message to start the game
