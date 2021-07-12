@@ -127,7 +127,7 @@ client.on('message', (message) => {
 
         //debug functions
         if(args[1] === "gen"){
-            console.log(Rolegen.generateRoles(1));
+            console.log(Rolegen.generateRoles(2));
         }
     }
 
@@ -265,7 +265,7 @@ function startNight(){
                 }
 
                 //check if they visited veteran
-                TODOTODO oogabooga;
+                //TODOTODO oogabooga;
             }
         }
 
@@ -463,6 +463,7 @@ function checkWin(){
     }
     if(mafiaWin){
         endgame("mafia");
+        return;
     }
 
     //if only town left
@@ -473,13 +474,15 @@ function checkWin(){
         }
     }
     if(townWin){
-        //endgame("town");
+        endgame("town");
+        return;
     }
 
 
     //if only one neutral left (not jester)   ////note: jester needs separate win code!
     if(players.size == 1 && players.values().next().value.data.alignment == "Neutral"){
         endgame(players.values().next().value.role);
+        return;
     }
 
     //stalemate breaking
@@ -545,14 +548,14 @@ function endgame(winner){
     //do perms for mafia and medium TODO
 
     if(winner === "mafia"){
-        Announce.announceMafiaWin(client);
+        Announce.announceWin(client, "Mafia");
     }
     else if(winner === "town"){
-        Announce.announceTownWin(client);
+        Announce.announceWin(client, "Town");
     }
     //if a neutral wins, pass winner = role name
     else{
-        Announce.announceNeutralWin(client, winner);
+        Announce.announceWin(client, winner);
     }
     
 }
