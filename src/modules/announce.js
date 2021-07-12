@@ -2,8 +2,9 @@ const { Client } = require('discord.js');
 const Timer = require('./timer.js');
 const dayLength = 20;
 
-//town channel constant
+// Town channel
 const town = '833755900098379837'
+
 // Emojis
 const nooseThink = '839900389989679125';
 
@@ -20,7 +21,7 @@ async function announceDay(client, num, cback){
 
 async function announceNight(client, num, cback){
     channel = client.channels.cache.get(town);
-   await channel.send("**It is now night " + num + ".**");
+    await channel.send("**It is now night " + num + ".**");
     Timer.setTimer(client, dayLength, cback);
 }
 
@@ -32,7 +33,7 @@ async function revealMayor(client, targetId){
 
 
 
-//game end/start announcements
+// Game start/end announcements
 function announceTownWin(client){
     channel = client.channels.cache.get(town);
     channel.send("Town has won!");

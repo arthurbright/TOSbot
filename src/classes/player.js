@@ -6,17 +6,29 @@ class Player {
         this.id = id;
         this.user = user;
         this.isAlive = true;
-        this.data = {};
+        
+        
 
 
         this.role = "None";
+        this.data = {};
+
+        
+        this.choices = {};
+
+
+
+        this.targets = {};
+        this.visitedBy = {};
+
+
     }
 
 
 
     setRole(role) {
         this.role = role;
-        this.data = roles.roleInfo.get(role);
+        this.data = roles.roleData.get(role);
     }
 
 
