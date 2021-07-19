@@ -1,5 +1,7 @@
 const presets = {
     /////////////////////////////////////TOWNSPEOPLE
+    highDefense: "Your target's defence was too high!",
+    
     bodyguard : {
         you : "You were attacked while defending someone!",
         target : "Someone tried to attack you, but someone fought off your attacker!"

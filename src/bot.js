@@ -202,23 +202,31 @@ function startNight(){
         //TODO: reset temp fields for each player: blocked, tattack, tdefense, as well as
         //visited and visit maps
         for(let player of players.values()){
+            //store the temporary (t) attack and defense each night
             player.data.tattack = 0;
             player.data.tdefense = 0;
+            //store the role of who attacked/defended
+            player.data.attacker = "";
+            player.data.defender = "";
+
+            player.data.allAttacks = [];
+            player.data.allDefenses = [];  //store pairs [id, power] just so we can send messages after
+
+            //store who visited who/
             visit.set(player, []);
             visited.set(player, []);
+
+            
 
         }
 
         //CALCULATIONS
         //Priority 1
 
-
-        let vet = "-2";
-         //veteran (EXECUTES NO MATTER WHAT)
-         for(let playerId of selectTarget.allRole("Veteran")){
-            let action = nightActions.get(playerId);
-            if(action == 1){
-                vet = playerId;
+        //vigilante suicide (UNSTOPPABLE ATTACK ON THEMSELF)
+        for(let playerId of selectTarget.allRole("Vigilante")){
+            if(players.get(playerId).data.suicidal == true){
+                players.get(playerId).attack(playerId, 10);
             }
         }
 
@@ -232,7 +240,9 @@ function startNight(){
                 visited.get(actions[0]).push(playerId);
                 visited.get(actions[1]).push(playerId);
 
-                
+                //send messages
+                Dm.dmMessage(client, actions[0], GameMessages.presets.busDriver.target);
+                Dm.dmMessage(client, actions[1], GameMessages.presets.busDriver.target);
 
                 //swap all actions bewtween the players with id actions[0] and actions[1]
                 for(let [id, _nightAction] of nightActions.entries()){
@@ -264,23 +274,11 @@ function startNight(){
                     }
                 }
 
-                //check if they visited veteran
-                //TODOTODO oogabooga;
             }
         }
 
 
         //NOTE: if doctor decides to not save anyone, store prevId as -1, not 0.
-        //NOTE: "vet" stores the id of the ALERT vet. if he is not alert, it will be -2;
-
-
-        //vigilante suicide (EXECUTES NO MATTER WHAT)
-        for(let playerId of selectTarget.allRole("Vigilante")){
-            if(players.get(playerId).data.suicidal == true){
-                Ld.killPlayer(client, playerId);
-                players.delete(playerId);
-            }
-        }
 
 
         //consort blocking
@@ -291,22 +289,31 @@ function startNight(){
                 visit.get(playerId).push(action);
                 visited.get(action).push(playerId);
 
-                //check if target alive
-                if(!players.has(action)){
-                    continue;
+                //if its not a serial killer or vet
+                if(players.get(action).role !== "Serial Killer" && players.get(action).role !== "Veteran"){
+
+                    if(nightActions.has(action)){
+                        if(typeof(nightActions.get(action)) === "object"){
+                            if(nightActions.get(action)[0] != 0){
+                                Dm.dmMessage(client, action, GameMessages.presets.consort.target);
+                            }
+                            nightActions.set(action, [0, 0]);
+                        }
+                        else{
+                            if(nightActions.get(action) != 0){
+                                Dm.dmMessage(client, action, GameMessages.presets.consort.target);
+                            }
+                            nightActions.set(action, 0); //removes their action
+                        }
+                    }
+
+                    
+
                 }
 
+                //if it is a serial killer, die 
                 if(players.get(action).role === "Serial Killer"){
-                    Ld.killPlayer(client, playerId, "Consort");
-                    players.delete(playerId);
-                }
-                else if(action === vet){
-                    Ld.killPlayer(client, playerId, "Consort");
-                    players.delete(playerId);
-                    vetKill = true;
-                }
-                else{
-                    players.get(action).data.blocked = true;
+                    players.get(playerId).attack(action, 1);
                 }
             }
         }
@@ -317,41 +324,313 @@ function startNight(){
             //check if they took an action
             if(action != 0){
 
-                //check if they were role-blocked
-                if(players.get(playerId).data.blocked == true){
-                    continue;
-                }
-
                 //update visits
                 visit.get(playerId).push(action);
                 visited.get(action).push(playerId);
 
-                //check if target is dead
-                if(!players.has(action)){
-                    continue;
-                }
+                //if its not a serial killer or vet
+                if(players.get(action).role !== "Serial Killer" && players.get(action).role !== "Veteran" && players.get(action).role !== "Consort"){
 
-                //check for serial killer/alert vet
+                    if(nightActions.has(action)){
+                        if(typeof(nightActions.get(action)) === "object"){
+                            if(nightActions.get(action)[0] != 0){
+                                Dm.dmMessage(client, action, GameMessages.presets.escort.target);
+                            }
+                            nightActions.set(action, [0, 0]);
+                        }
+                        else{
+                            if(nightActions.get(action) != 0){
+                                Dm.dmMessage(client, action, GameMessages.presets.escort.target);
+                            }
+                            nightActions.set(action, 0); //removes their action
+                        }
+                    }        
+                }
+                //if it is a serial killer, die
                 if(players.get(action).role === "Serial Killer"){
-                    Ld.killPlayer(client, playerId, "Escort");
-                    players.delete(playerId);
+                    players.get(playerId).attack(action, 1);
                 }
-                else if(action === vet){
-                    Ld.killPlayer(client, playerId, "Escort");
-                    players.delete(playerId);
-                    vetKill = true;
-                }
-                else{
-                    players.get(action).data.blocked = true;
+                //if it is a consort, tell them
+                if(players.get(action).role === "Consort"){
+                    Dm.dmMessage(client, action, "Someone tried to role-block you!");
                 }
             }
         }
 
-        
+
+        //PROTECTIVES (Doctor, bodyguard) --> on second thought, bodyguard should go LAST, along with intel
+        //Doctor
+        for(let playerId of selectTarget.allRole("Doctor")){
+            let action = nightActions.get(playerId);
+            
+            if(action != 0){
+                //update visits
+                visit.get(playerId).push(action);
+                visited.get(action).push(playerId);
+
+                players.get(action).defend(playerId, 2);
+                players.get(playerId).data.prevId = action; //store the person they previously protected so they cant do it again next night
+            }
+            else{
+                players.get(playerId).data.prevId = -1;
+            }
+        }
+
+        //Arsonist
+        for(let playerId of selectTarget.allRole("Arsonist")){
+            let action = nightActions.get(playerId);
+            
+            
+            if(action[0] == 1){
+                //douse!
+                //update visits
+                visit.get(playerId).push(action[1]);
+                visited.get(action[1]).push(playerId);
+
+                players.get(action[1]).data.doused = true;
+            }
+            else if(action[0] == 2){
+                //ignite! give unstoppable attack to all doused
+                for(let dousedPlayerId of selectTarget.getTargets(p => {return p.data.doused == true})){
+                    players.get(dousedPlayerId).attack(playerId, 3);
+                }
+
+            }
+        }
+
+        //ATTACKERS
+        //Vigilante killing
+        for(let playerId of selectTarget.allRole("Vigilante")){
+            let action = nightActions.get(playerId);
+            
+            if(action != 0){
+                //update visits
+                visit.get(playerId).push(action);
+                visited.get(action).push(playerId);
+
+                players.get(action).attack(playerId, 1);
+            }
+        }
+
+        //Serial Killer
+        for(let playerId of selectTarget.allRole("Serial Killer")){
+            let action = nightActions.get(playerId);
+            
+            if(action != 0){
+                //update visits
+                visit.get(playerId).push(action);
+                visited.get(action).push(playerId);
+
+                players.get(action).attack(playerId, 1);
+            }
+        }
+
+        //Mafioso
+        for(let playerId of selectTarget.allRole("Mafioso")){
+            let action = nightActions.get(playerId);
+            
+            if(action != 0){
+                //update visits
+                visit.get(playerId).push(action);
+                visited.get(action).push(playerId);
+
+                players.get(action).attack(playerId, 1);
+            }
+        }
+
+        //Godfather
+        for(let playerId of selectTarget.allRole("Godfather")){
+            let action = nightActions.get(playerId);
+            
+            if(action != 0 && noMafioso()){ //gotta be no mafioso for godfather to attack
+                //update visits
+                visit.get(playerId).push(action);
+                visited.get(action).push(playerId);
+
+                players.get(action).attack(playerId, 1);
+            }
+        }
 
 
+        let bodyguardId = "";
+        let guarded = "";
+        //Bodyguard
+        for(let playerId of selectTarget.allRole("Bodyguard")){
+            let action = nightActions.get(playerId);
+            //action: [vest, target]
+
+            //if vest, increase defense
+            if(action[0] == 1){
+                players.get(playerId).defend(playerId, 1);
+            }
+
+            //if defending someone, redirect all attacks
+            if(action[1] != 0){
+                //update visits
+                visit.get(playerId).push(action[1]);
+                visited.get(action[1]).push(playerId);
 
 
+                //store ids for calculation later
+                guarded = action[1];
+                bodyguardId = playerId;
+            }
+            
+        }
+s
+        //variable to help
+
+        //INTEL: sherrif, consig, tracker, lookout
+        //Sheriff
+        for(let playerId of selectTarget.allRole("Sheriff")){
+            let action = nightActions.get(playerId);
+            
+            if(action != 0){
+                //update visits
+                visit.get(playerId).push(action);
+                visited.get(action).push(playerId);
+
+                let targetPlayer = players.get(action);
+
+                if(targetPlayer.data.alignment === "Town" || targetPlayer.role === "Godfather" || targetPlayer.role === "Arsonist" || targetPlayer.role === "Jester"){
+                    Dm.dmMessage(client, playerId, "**Your target is NOT suspicious!**");
+                }
+                else{
+                    Dm.dmMessage(client, playerId, "**Your target is SUSPICIOUS!**");
+                }
+                
+            }
+        }
+
+        //Consigliere
+        for(let playerId of selectTarget.allRole("Consigliere")){
+            let action = nightActions.get(playerId);
+            
+            if(action != 0){
+                //update visits
+                visit.get(playerId).push(action);
+                visited.get(action).push(playerId);
+
+                Dm.dmMessage(client, playerId, "**Your target is a " + players.get(action).role + "!**");
+                
+            }
+        }
+
+        //add the trackers and lookouts to the visited maps first, but no action yet
+         //Lookout
+         for(let playerId of selectTarget.allRole("Lookout")){
+            let action = nightActions.get(playerId);
+            
+            if(action != 0){
+                //update visits
+                visit.get(playerId).push(action);
+                visited.get(action).push(playerId);
+            }
+        }
+
+         //Tracker
+        for(let playerId of selectTarget.allRole("Tracker")){
+            let action = nightActions.get(playerId);
+            
+            if(action != 0){
+                //update visits
+                visit.get(playerId).push(action);
+                visited.get(action).push(playerId);
+            }
+        }
+
+
+        //now, actually returning intel
+        //Lookout
+        for(let playerId of selectTarget.allRole("Lookout")){
+            let action = nightActions.get(playerId);
+            
+            if(action != 0){
+                Dm.dmMessage(client, playerId, GameMessages.lookoutMsg(client, visited.get(action)));
+                
+            }
+        }
+
+         //Tracker
+        for(let playerId of selectTarget.allRole("Tracker")){
+            let action = nightActions.get(playerId);
+            
+            if(action != 0){
+                Dm.dmMessage(client, playerId, GameMessages.trackerMsg(client, visit.get(action)));
+                
+            }
+        }
+
+        //Veteran
+        for(let playerId of selectTarget.allRole("Veteran")){
+            let action = nightActions.get(playerId);
+            let vetAttacked = false;
+            if(action == 1){
+                //attack all who visited, and also increase defense
+                players.get(playerId).defend("Veteran", 1);
+                for(let p of visited.get(playerId)){
+                    if(players.get(p).role === "Tracker") continue; //tracker immune to vet
+                    players.get(p).attack(playerId, 2);
+                    vetAttacked = true;
+                }
+                
+            }
+
+            //send the vet a message if they were visited on alert
+            if(vetAttacked == true){
+                Dm.dmMessage(client, playerId, GameMessages.presets.veteran.you);
+            }
+        }
+
+        let transferedAttacks = [];
+        //transfer attacks to bodyguard
+        if(guarded !== ""){
+            transferedAttacks = players.get(guarded).data.allAttacks;
+            players.get(guarded).data.allAttacks = []; 
+        }
+
+
+        /////////////////////////////////////////////////////////////////////////////////////////////ALL TAGS ASSIGNED, START KILLING AND SEND MSGS
+        let purge = []; //ids of all players who are dead
+
+        for(let player of players.values()){
+            //defense too high messages / you were attacked but defense saved you
+            for(let attackAttempt of player.data.allAttacks){
+                if(attackAttempt[1] <= player.getDefense()){
+                    Dm.dmMessage(client, attackAttempt[0], GameMessages.presets.highDefense);
+                }
+                //if their default defense was already too high
+                if(attackAttempt[1] <= player.data.def && player.data.def == player.getDefense()){
+                    Dm.dmMessage(client, player.id, "Someone attacked you but your defense was too high!");
+                }
+            }
+
+            //successful attack (highest attack power)
+            if(player.data.tattack > player.getDefense()){
+                Dm.dmMessage(client, player.id, "**You were killed by a(n) " + players.get(attacker).role + "!**" );
+                purge.push(player.id);
+            }
+            
+            //defense messages (doctor, bodyguard)
+            //doctor
+            if(players.get(player.data.defender).role === "Doctor" && player.data.tattack <= 2 && player.data.tattack > player.data.def){
+                Dm.dmMessage(client, player.id, GameMessages.presets.doctor.target);
+                Dm.dmMessage(client, player.data.defender, GameMessages.presets.doctor.you);
+            }
+
+            //bodyguard
+            if(transferredAttacks.length > 0){
+                Dm.dmMessage(client, guarded, GameMessages.presets.bodyguard.target);
+                Dm.dmMessage(client, bodyguardId, GameMessages.presets.bodyguard.you);
+            }
+
+
+        }
+
+        for(let id of purge){
+            Ld.killPlayer(client, id, players.get(id).role);
+            players.delete(id);
+        }
 
         //NIGHT LOGIC ENDS HERE
 
@@ -382,6 +661,9 @@ function startNight(){
                 nightActions.set(player.id, _alert);
             });
         }
+        else if(player.role === "Veteran" && player.data.alerts == 0){ //null report for vet
+            nightActions.set(player.id, 0)
+        }
         else if(player.role === "Bus Driver"){
             Dm.askBusDriver(client, player.id, getPlayerIds(), (targets)=>{
                 nightActions.set(player.id, targets);
@@ -396,6 +678,9 @@ function startNight(){
             });
             
         }
+        else if(player.role === "Vigilante" && player.data.bullets == 0){ //null report for vig
+            nightActions.set(player.id, 0);
+        }
         else if(player.role === "Doctor"){
             Dm.askMove(client, player.id, 1, getPlayerIds().filter(item => item !== player.data.prevId), (target)=>{
                 nightActions.set(player.id, target);
@@ -403,7 +688,12 @@ function startNight(){
         }
         else if(player.role === "Bodyguard"){
             Dm.askBodyGuard(client, player.id, getPlayerIds().filter(item => item!== player.id), player.data.vests, (response)=>{
-                nightActions.set(player.id, response);
+                if(player.data.vests == 0){
+                    nightActions.set(player.id, [0, response[1]])
+                }
+                else{
+                    nightActions.set(player.id, response);
+                }
             });
         }
         else if(player.role === "Arsonist"){
@@ -632,7 +922,9 @@ function promoteMafioso(){
 
 //actually promotes someone to mafioso
 function promote(id){
+    let dousedd = players.get(id).data.doused;
     players.get(id).setRole("Mafioso");
+    players.get(id).data.doused = dousedd; //maintain dousage
     Dm.dmMessage(client, id, "**You have been promoted to Mafioso!**");
 }
 
@@ -702,6 +994,11 @@ function resetChannels(){
     _deadSea.messages.fetch({limit: 100}).then(messages =>{
         _deadSea.bulkDelete(messages);
     })
+}
+
+//id to username
+function getUsername(id){
+    return client.users.cache.get(id).username;
 }
 
 
