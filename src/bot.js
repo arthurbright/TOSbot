@@ -213,8 +213,8 @@ function startNight(){
             player.data.allDefenses = [];  //store pairs [id, power] just so we can send messages after
 
             //store who visited who/
-            visit.set(player, []);
-            visited.set(player, []);
+            visit.set(player.id, []);
+            visited.set(player.id, []);
 
             
 
@@ -477,7 +477,7 @@ function startNight(){
             }
             
         }
-s
+
         //variable to help
 
         //INTEL: sherrif, consig, tracker, lookout
@@ -582,7 +582,7 @@ s
             }
         }
 
-        let transferedAttacks = [];
+        let transferredAttacks = [];
         //transfer attacks to bodyguard
         if(guarded !== ""){
             transferedAttacks = players.get(guarded).data.allAttacks;
@@ -607,16 +607,18 @@ s
 
             //successful attack (highest attack power)
             if(player.data.tattack > player.getDefense()){
-                Dm.dmMessage(client, player.id, "**You were killed by a(n) " + players.get(attacker).role + "!**" );
+                Dm.dmMessage(client, player.id, "**You were killed by a(n) " + players.get(player.data.attacker).role + "!**" );
                 purge.push(player.id);
             }
             
             //defense messages (doctor, bodyguard)
             //doctor
-            if(players.get(player.data.defender).role === "Doctor" && player.data.tattack <= 2 && player.data.tattack > player.data.def){
+            /*
+            if(player.data.defender != undefined && players.get(player.data.defender).role === "Doctor" && player.data.tattack <= 2 && player.data.tattack > player.data.def){
                 Dm.dmMessage(client, player.id, GameMessages.presets.doctor.target);
                 Dm.dmMessage(client, player.data.defender, GameMessages.presets.doctor.you);
             }
+            */
 
             //bodyguard
             if(transferredAttacks.length > 0){
@@ -692,6 +694,9 @@ s
                     nightActions.set(player.id, [0, response[1]])
                 }
                 else{
+                    if(response[0] == 1){
+                        player.data.vests -= 1;
+                    }
                     nightActions.set(player.id, response);
                 }
             });

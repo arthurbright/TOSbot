@@ -1,7 +1,7 @@
 const { Client } = require('discord.js');
 const Discord = require('discord.js');
 const Timer = require('./timer.js');
-const dayLength = 20;
+const dayLength = 30;
 
 //town channel constant
 const town = '833755900098379837'

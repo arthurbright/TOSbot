@@ -25,7 +25,7 @@ class Player {
             this.data.tattack = power;
         }
 
-        this.allAttacks.push([attackerId, power]);
+        this.data.allAttacks.push([attackerId, power]);
     }
 
     defend(defenderId, power){
@@ -34,7 +34,7 @@ class Player {
             this.data.tdefense = power;
         }
 
-        this.allDefenses.push([defenderId, power]);
+        this.data.allDefenses.push([defenderId, power]);
     }
 
     getDefense(){
