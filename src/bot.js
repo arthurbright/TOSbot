@@ -44,6 +44,7 @@ client.on('ready', () => {
 
 
 let players = new Map();
+let playersCache = new Map();
 module.exports.players = players;
 
 gameOver = false;
@@ -118,6 +119,9 @@ client.on('message', (message) => {
 
             //start the first day
             gameOver = false;
+            for(let player in players.values()){
+                playersCache.set(player.id, player.data.alignment);
+            } //store cache of all players for end (dm ppl who won/lost)
             startDay();
         }
 
@@ -613,12 +617,12 @@ function startNight(){
             
             //defense messages (doctor, bodyguard)
             //doctor
-            /*
-            if(player.data.defender != undefined && players.get(player.data.defender).role === "Doctor" && player.data.tattack <= 2 && player.data.tattack > player.data.def){
+            
+            if(player.data.defender !== "" && players.get(player.data.defender).role === "Doctor" && player.data.tattack <= 2 && player.data.tattack > player.data.def){
                 Dm.dmMessage(client, player.id, GameMessages.presets.doctor.target);
                 Dm.dmMessage(client, player.data.defender, GameMessages.presets.doctor.you);
             }
-            */
+            
 
             //bodyguard
             if(transferredAttacks.length > 0){
@@ -837,6 +841,7 @@ function endgame(winner){
     gameOver = true;
     Timer.stopTimer();
     players = new Map();
+    playersCache = new Map();
     dayNum = 1;
     Ld.reset(client);
 
@@ -844,13 +849,40 @@ function endgame(winner){
 
     if(winner === "mafia"){
         Announce.announceWin(client, "Mafia");
+        //message all mafia that they won
+        for(let [id, alignment] of playersCache.entries()){
+            if(alignment === "Mafia"){
+                Dm.dmMessage(client, id, GameMessages.presets.youWin);
+            }
+            else{
+                Dm.dmMessage(client, id, GameMessages.presets.youLose);
+            }
+        }
     }
     else if(winner === "town"){
         Announce.announceWin(client, "Town");
+        //message all town that they won
+        for(let [id, alignment] of playersCache.entries()){
+            if(alignment === "Town"){
+                Dm.dmMessage(client, id, GameMessages.presets.youWin);
+            }
+            else{
+                Dm.dmMessage(client, id, GameMessages.presets.youLose);
+            }
+        }
     }
     //if a neutral wins, pass winner = role name
     else{
         Announce.announceWin(client, winner);
+        //message the remaining neutral
+        for(let player of players.values()){
+            if(player.role === winner){
+                Dm.dmMessage(client, player.id, GameMessages.presets.youWin);
+            }
+            else{
+                Dm.dmMessage(client, player.id, GameMessages.presets.youLose);
+            }
+        }
     }
     
 }

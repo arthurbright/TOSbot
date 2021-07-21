@@ -1,7 +1,9 @@
 const presets = {
     /////////////////////////////////////TOWNSPEOPLE
     highDefense: "Your target's defence was too high!",
-    
+    youWin: "**Congrats! You won!**",
+    youLose: "**You lost this game oof**",
+
     bodyguard : {
         you : "You were attacked while defending someone!",
         target : "Someone tried to attack you, but someone fought off your attacker!"
